@@ -1,4 +1,4 @@
-from jasminesnake import __version__
+from jasminesnake import __version__, __snake__
 
 from antlr4 import *
 from .lex import JavaScriptLexer, JavaScriptParser
@@ -30,10 +30,7 @@ def main():
     print("Jasmine Snake v{version}".format(version=__version__))
 
     if args.snake:
-        print(
-            colorama.Style.DIM
-            + "[snake is sleeping now, so you see this stub. pretend you see the snake, please.]"
-        )
+        print(colorama.Style.DIM + __snake__ + colorama.Style.RESET_ALL)
         print(
             colorama.Fore.BLACK
             + colorama.Back.YELLOW
