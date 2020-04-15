@@ -44,13 +44,19 @@ def main():
 
     print()
 
-    input_stream = InputStream('"use strict";var a;\na=2+a;')
+    input_stream = InputStream("var a;\n{a=2+a;}")
     lexer = JSL(input_stream)
     stream = CommonTokenStream(lexer)
+
+    stream.fill()
+    for token in stream.tokens:
+        print("Token: {}".format(str(token)))
+
     parser = JSP(stream)
     print("Created parsers")
     tree = parser.program()
-    ParseTreeWalker.DEFAULT.walk(WriteTreeListener(), tree)
+    print(tree.toStringTree(parser.ruleNames))
+    # ParseTreeWalker.DEFAULT.walk(WriteTreeListener(), tree)
 
 
 if __name__ == "__main__":
