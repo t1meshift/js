@@ -192,7 +192,7 @@ StringLiteral:                 ('"' DoubleStringCharacter* '"'
              ;
 
 // TODO: `${`tmp`}`
-TemplateStringLiteral:          '`' ('\\`' | ~'`')* '`';
+//TemplateStringLiteral:          '`' ('\\`' | ~'`')* '`';
 
 WhiteSpaces:                    [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
 

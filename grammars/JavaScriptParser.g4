@@ -150,7 +150,7 @@ iterationStatement
     | For '(' (expressionSequence | variableDeclarationList)? ';' expressionSequence? ';' expressionSequence? ')' statement   # ForStatement
     | For '(' (singleExpression | variableDeclarationList) In expressionSequence ')' statement                                # ForInStatement
     // strange, 'of' is an identifier. and self.p("of") not work in sometime.
-    | For /*Await?*/ '(' (singleExpression | variableDeclarationList) identifier{self.p("of")}? expressionSequence ')' statement  # ForOfStatement
+//    | For /*Await?*/ '(' (singleExpression | variableDeclarationList) identifier{self.p("of")}? expressionSequence ')' statement  # ForOfStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
@@ -346,7 +346,7 @@ singleExpression
     | <assoc=right> singleExpression '=' singleExpression                   # AssignmentExpression
     | <assoc=right> singleExpression assignmentOperator singleExpression    # AssignmentOperatorExpression
     | Import '(' singleExpression ')'                                       # ImportExpression
-    | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
+//    | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
 //    | yieldStatement                                                        # YieldExpression // ECMAScript 6
     | This                                                                  # ThisExpression
     | identifier                                                            # IdentifierExpression
@@ -402,7 +402,7 @@ literal
     : NullLiteral
     | BooleanLiteral
     | StringLiteral
-    | TemplateStringLiteral
+//    | TemplateStringLiteral
     | RegularExpressionLiteral
     | numericLiteral
     | bigintLiteral
