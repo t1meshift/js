@@ -74,8 +74,7 @@ def main():
         ast_tree = from_parse_tree(tree)
         ascii_ast = to_ascii_tree(ast_tree)
 
-        logging.debug("Got an AST!")
-        logging.debug(ascii_ast)
+        logging.info("Got an AST!\n%s", ascii_ast)
         # TODO: run logic
         sys.exit(0)
 
@@ -99,8 +98,8 @@ def main():
             ast_tree = from_parse_tree(tree)
             ascii_ast = to_ascii_tree(ast_tree)
 
-            logging.debug("Got an AST!")
-            logging.debug(ascii_ast)
+            logging.info("Got an AST!")
+            logging.info(ascii_ast)
             # TODO: run logic
     except EOFError:
         print("Ctrl-D received, shutting down...")
