@@ -139,7 +139,6 @@ Function:                       'function';
 This:                           'this';
 Default:                        'default';
 If:                             'if';
-Throw:                          'throw';
 Delete:                         'delete';
 In:                             'in';
 As:                             'as';
@@ -155,6 +154,7 @@ From:                           'from';
 //Debugger:                       'debugger';
 //With:                           'with';
 //Try:                            'try';
+//Throw:                          'throw';
 
 /// Future Reserved Words
 

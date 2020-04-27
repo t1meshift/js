@@ -471,7 +471,7 @@ keyword
 //    | With
     | Default
     | If
-    | Throw
+//    | Throw
     | Delete
     | In
 //    | Try
