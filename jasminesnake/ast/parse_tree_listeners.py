@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List
+from typing import Optional, List, Union
 import antlr4.ParserRuleContext
 
 from lex.JavaScriptParser import JavaScriptParser
@@ -21,6 +21,52 @@ def _get_source_location(
         end_pos.column += 1
 
     return ast.nodes.SourceLocation(source=source, start=start_pos, end=end_pos)
+
+
+class AssignableListener(JSBaseListener):
+    _result: Union[
+        ast.nodes.Identifier, ast.nodes.ObjectPattern, ast.nodes.ArrayPattern
+    ]
+
+    @property
+    def result(self):
+        return self._result
+
+    def enterAssignable(self, ctx: JavaScriptParser.AssignableContext):
+        logging.debug("Entered section Assignable")
+        ctx.getChild(0).enterRule(self)
+
+    def enterIdentifier(self, ctx: JavaScriptParser.IdentifierContext):
+        logging.debug("Entered section Identifier")
+        loc = _get_source_location(ctx, None)
+        self._result = ast.nodes.Identifier(loc, ctx.getText())
+
+    def enterArrayLiteral(self, ctx: JavaScriptParser.ArrayLiteralContext):
+        logging.debug("Entered section ArrayLiteral")
+        pass  # TODO
+
+    def enterObjectLiteral(self, ctx: JavaScriptParser.ObjectLiteralContext):
+        logging.debug("Entered section ObjectLiteral")
+        pass  # TODO
+
+
+class VariableDeclarationListener(JSBaseListener):
+    _var_decl: ast.nodes.VariableDeclarator
+
+    @property
+    def var_declarator(self):
+        return self._var_decl
+
+    def enterVariableDeclaration(
+        self, ctx: JavaScriptParser.VariableDeclarationContext
+    ):
+        loc = _get_source_location(ctx, None)
+        assign_listener = AssignableListener()
+        ctx.assignable().enterRule(assign_listener)
+        # ctx.singleExpression().enterRule(expression_listener)  # FIXME No ExpressionListener yet
+        self._var_decl = ast.nodes.VariableDeclarator(
+            loc, assign_listener.result, None
+        )  # FIXME
 
 
 class StatementListener(JSBaseListener):
@@ -50,12 +96,26 @@ class StatementListener(JSBaseListener):
         loc = _get_source_location(ctx, None)  # FIXME source param is None
         self._stmt = ast.nodes.BlockStatement(loc, stmt_list)
 
+    def enterVariableStatement(self, ctx: JavaScriptParser.VariableStatementContext):
+        logging.debug("Entered section VariableStatement")
+        ctx.variableDeclarationList().enterRule(self)
+
     def enterVariableDeclarationList(
         self, ctx: JavaScriptParser.VariableDeclarationListContext
     ):
         """Listener for VariableDeclaration."""
         logging.debug("Entered section VariableDeclaration")
-        pass
+
+        var_modifier: ast.nodes.VarDeclKind = ctx.varModifier().getText()
+        var_decls: List[ast.nodes.VariableDeclarator] = []
+
+        for var_decl in ctx.variableDeclaration():
+            var_decl_listener = VariableDeclarationListener()
+            var_decl.enterRule(var_decl_listener)
+            var_decls.append(var_decl_listener.var_declarator)
+
+        loc = _get_source_location(ctx, None)
+        self._stmt = ast.nodes.VariableDeclaration(loc, var_modifier, var_decls)
 
     def enterEmptyStatement(self, ctx: JavaScriptParser.EmptyStatementContext):
         """Listener for EmptyStatement."""
