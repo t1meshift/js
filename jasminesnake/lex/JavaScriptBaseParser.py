@@ -1,4 +1,5 @@
 from antlr4 import *
+import logging
 
 relativeImport = False
 if __name__ is not None and "." in __name__:

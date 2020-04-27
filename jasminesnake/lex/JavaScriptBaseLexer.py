@@ -1,4 +1,5 @@
 from antlr4 import *
+import logging
 
 relativeImport = False
 if __name__ is not None and "." in __name__:
@@ -7,7 +8,7 @@ if __name__ is not None and "." in __name__:
 
 class JavaScriptBaseLexer(Lexer):
     def __init__(self, *args, **kwargs):
-        print("JavaScriptBaseLexerInit")
+        logging.debug("JavaScriptBaseLexerInit")
         super(JavaScriptBaseLexer, self).__init__(*args, **kwargs)
 
         """Stores values of nested modes. By default mode is strict or

@@ -1,34 +1,53 @@
-from jasminesnake import __version__, __snake__
-
-from antlr4 import *
-from .lex import JavaScriptLexer, JavaScriptParser
-
+"""Pylint tells me this module should have a docstring.
+So here it is.
+"""
+import sys
 import argparse
+import logging
 import colorama
+import coloredlogs
+
+from jasminesnake import __version__, __snake__, LOG_LEVELS
+from .js_stream import JSBaseStream, JSStringStream, JSFileStream
+from .lex.ErrorListeners import LogErrorListener
+import ast
 
 
-arg_parser = argparse.ArgumentParser(
-    description="Jasmine Snake, another JS interpreter in Python",
-    epilog="I hope you don't use it, **especially** in production.",
-)
+def create_argument_parser():
+    _arg_parser = argparse.ArgumentParser(
+        description="Jasmine Snake, another JS interpreter in Python",
+        epilog="I hope you don't use it, **especially** in production.",
+    )
 
-arg_parser.add_argument("--snake", action="store_true", help="Print a snake")
-args = arg_parser.parse_args()
+    _arg_parser.add_argument("--snake", action="store_true", help="print a snake")
+    _arg_parser.add_argument(
+        "--verbose",
+        "-v",
+        action="count",
+        default=0,
+        help="be more verbose. up to 4 (-vvvv) could be handled, more are ignored",
+    )
+    _arg_parser.add_argument(
+        "infile",
+        type=str,
+        help='JS input file. use "-" to read input from stdin.',
+        nargs="?",
+    )
 
-JSL = JavaScriptLexer.JavaScriptLexer
-JSP = JavaScriptParser.JavaScriptParser
-
-
-class WriteTreeListener(ParseTreeListener):
-    def visitTerminal(self, node: TerminalNode):
-        print("Visit Terminal: " + str(node) + " - " + repr(node))
+    return _arg_parser
 
 
 def main():
+    # Init colorama
     colorama.init()
 
-    print("Jasmine Snake v{version}".format(version=__version__))
+    # Init logging
+    log_level = min(args.verbose, 4)  # Ignore verbosity values more than 4
+    coloredlogs.install(
+        level=LOG_LEVELS[log_level]["level"], fmt=LOG_LEVELS[log_level]["format"]
+    )
 
+    # Print the snake if an argument is present
     if args.snake:
         print(colorama.Style.DIM + __snake__ + colorama.Style.RESET_ALL)
         print(
@@ -39,22 +58,48 @@ def main():
             + colorama.Fore.RESET
         )
 
+    # Read JS code from file or stdin
+    if args.infile is not None:
+        stream: JSBaseStream
+
+        if args.infile == "-":
+            input_str = sys.stdin.read()
+            stream = JSStringStream(input_str)
+
+        else:
+            stream = JSFileStream(args.infile, LogErrorListener())
+
+        tree = stream.parse()
+        ast_tree = ast.from_parse_tree(tree)
+
+        # TODO: run logic
+        sys.exit(0)
+
+    print("Jasmine Snake v{version}".format(version=__version__))
+    print(
+        colorama.Fore.YELLOW
+        + "Notice that only single-line statements are supported."
+        + colorama.Fore.RESET
+    )
     print()
 
-    input_stream = InputStream("var a;\n{a=2+a;}")
-    lexer = JSL(input_stream)
-    stream = CommonTokenStream(lexer)
+    try:
+        while True:
+            input_str = input("> ")
+            logging.debug("Got input %s", input_str)
 
-    stream.fill()
-    for token in stream.tokens:
-        print("Token: {}".format(str(token)))
+            stream = JSStringStream(input_str, LogErrorListener())
+            tree = stream.parse()
+            logging.debug("Got tree %s", tree.toStringTree(stream.parser.ruleNames))
 
-    parser = JSP(stream)
-    print("Created parsers")
-    tree = parser.program()
-    print(tree.toStringTree(parser.ruleNames))
-    # ParseTreeWalker.DEFAULT.walk(WriteTreeListener(), tree)
+            ast_tree = ast.from_parse_tree(tree)
+            # TODO: run logic
+    except EOFError:
+        print("Ctrl-D received, shutting down...")
+        sys.exit(0)
 
 
 if __name__ == "__main__":
+    arg_parser = create_argument_parser()
+    args = arg_parser.parse_args()
     main()

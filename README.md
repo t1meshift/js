@@ -22,7 +22,7 @@ pip install -r requirements.txt # Use requirements-dev.txt if you want to run te
 ## Running
 
 ```bash
-antlr4 -o jasminesnake/lex -package lex -Dlanguage=Python3 grammars/*.g4
+antlr4 -Xexact-output-dir -o jasminesnake/lex -package lex -Dlanguage=Python3 -listener grammars/*.g4
 python -m jasminesnake
 ```
 
