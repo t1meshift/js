@@ -478,7 +478,7 @@ class VariableDeclarator(Node):
     """A variable declarator."""
 
     def __init__(
-        self, loc: Optional[SourceLocation], var_id: Pattern, init: Optional[Exception]
+        self, loc: Optional[SourceLocation], var_id: Pattern, init: Optional[Expression]
     ):
         super().__init__("VariableDeclarator", loc)
         self.id = var_id
