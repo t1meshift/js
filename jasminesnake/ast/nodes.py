@@ -21,8 +21,9 @@ Todo:
     * Add support for lacking features
 """
 
-from typing import List, Union, Optional, Literal as TypeLiteral, TypedDict
+from typing import List, Union, Optional, Literal as TypeLiteral, TypedDict, Any
 from enum import Enum
+from collections import OrderedDict
 
 # The Lord sees I actually wanted to split it up, but ESTree hierarchy is so messed up... No. It's actually *fucked up*
 # that much that I couldn't even resolve circular dependencies in the submodules. I have to reap what I've sown.
@@ -140,6 +141,10 @@ class Property:
     ...
 
 
+class Identifier:
+    ...
+
+
 # "Node objects" block
 
 
@@ -154,6 +159,9 @@ class Position:
 
         self.line = line
         self.column = column
+
+    def __str__(self):
+        return f"{self.line}:{self.column}"
 
 
 class SourceLocation:
@@ -171,6 +179,10 @@ class SourceLocation:
         self.source = source
         self.start = start
         self.end = end
+
+    def __str__(self):
+        src = "" if self.source is None else f"{self.source}:"
+        return f"{src}{str(self.start)}"
 
 
 class Node:
@@ -191,16 +203,15 @@ class Node:
         self.type = node_type
         self.loc = loc
 
+        self._fields: OrderedDict[str, Any] = OrderedDict()
+        self._fields.update({"type": self.type, "loc": self.loc})
 
-# "Identifier" block
+    def __str__(self):
+        return f"{self.type} at {str(self.loc)}"
 
-
-class Identifier(Expression, Pattern):
-    """An identifier. Note that an identifier may be an expression or a destructuring pattern."""
-
-    def __init__(self, loc: Optional[SourceLocation], name: str):
-        super(Identifier, self).__init__("Identifier", loc)
-        self.name = name
+    @property
+    def fields(self):
+        return self._fields
 
 
 # "Literal" block
@@ -214,6 +225,7 @@ class Literal(Expression):
     ):
         super().__init__("Literal", loc)
         self.value = value
+        self._fields.update({"value": self.value})
 
 
 # "Programs" block
@@ -231,6 +243,7 @@ class Program(Node):
         super().__init__("Program", loc)
         self.body = body
         self.source_type = source_type
+        self._fields.update({"sourceType": self.source_type, "body": self.body})
 
 
 # "Functions" block
@@ -257,6 +270,7 @@ class Function(Node):
         self.id = function_id
         self.params = params
         self.body = body
+        self._fields.update({"id": self.id, "params": self.params, "body": self.body})
 
 
 # "Statements" block
@@ -282,6 +296,7 @@ class BlockStatement(Statement):
     def __init__(self, loc: Optional[SourceLocation], body: List[Statement]):
         super().__init__("BlockStatement", loc)
         self.body = body
+        self._fields.update({"body": self.body})
 
 
 class ExpressionStatement(Statement):
@@ -290,6 +305,7 @@ class ExpressionStatement(Statement):
     def __init__(self, loc: Optional[SourceLocation], expression: Expression):
         super().__init__("ExpressionStatement", loc)
         self.expression = expression
+        self._fields.update({"expression": self.expression})
 
 
 class Directive(Node):
@@ -303,6 +319,9 @@ class Directive(Node):
         super().__init__("Directive", loc)
         self.expression = expression
         self.directive = directive
+        self._fields.update(
+            {"expression": self.expression, "directive": self.directive}
+        )
 
 
 class FunctionBody(BlockStatement):
@@ -320,6 +339,7 @@ class ReturnStatement(Statement):
     def __init__(self, loc: Optional[SourceLocation], argument: Optional[Expression]):
         super().__init__("ReturnStatement", loc)
         self.argument = argument
+        self._fields.update({"argument": self.argument})
 
 
 class BreakStatement(Statement):
@@ -328,6 +348,7 @@ class BreakStatement(Statement):
     def __init__(self, loc: Optional[SourceLocation], label: Optional[Identifier]):
         super().__init__("BreakStatement", loc)
         self.label = label
+        self._fields.update({"label": self.label})
 
 
 class ContinueStatement(Statement):
@@ -336,6 +357,7 @@ class ContinueStatement(Statement):
     def __init__(self, loc: Optional[SourceLocation], label: Optional[Identifier]):
         super().__init__("ContinueStatement", loc)
         self.label = label
+        self._fields.update({"label": self.label})
 
 
 class IfStatement(Statement):
@@ -352,6 +374,13 @@ class IfStatement(Statement):
         self.test = test
         self.consequent = consequent
         self.alternate = alternate
+        self._fields.update(
+            {
+                "test": self.test,
+                "consequent": self.consequent,
+                "alternate": self.alternate,
+            }
+        )
 
 
 class WhileStatement(Statement):
@@ -363,6 +392,7 @@ class WhileStatement(Statement):
         super().__init__("WhileStatement", loc)
         self.test = test
         self.body = body
+        self._fields.update({"test": self.test, "body": self.body})
 
 
 class DoWhileStatement(Statement):
@@ -374,6 +404,7 @@ class DoWhileStatement(Statement):
         super().__init__("DoWhileStatement", loc)
         self.body = body
         self.test = test
+        self._fields.update({"body": self.body, "test": self.test})
 
 
 class ForStatement(Statement):
@@ -392,6 +423,14 @@ class ForStatement(Statement):
         self.test = test
         self.update = update
         self.body = body
+        self._fields.update(
+            {
+                "init": self.init,
+                "test": self.test,
+                "update": self.update,
+                "body": self.body,
+            }
+        )
 
 
 class ForInStatement(Statement):
@@ -408,6 +447,7 @@ class ForInStatement(Statement):
         self.left = left
         self.right = right
         self.body = body
+        self._fields.update({"left": self.left, "right": self.right, "body": self.body})
 
 
 # "Declarations" block
@@ -443,6 +483,7 @@ class VariableDeclarator(Node):
         super().__init__("VariableDeclarator", loc)
         self.id = var_id
         self.init = init
+        self._fields.update({"id": self.id, "init": self.init})
 
 
 class VariableDeclaration(Declaration):
@@ -457,6 +498,7 @@ class VariableDeclaration(Declaration):
         super().__init__("VariableDeclaration", loc)
         self.declarations = declarations
         self.kind = kind
+        self._fields.update({"kind": self.kind, "declarations": self.declarations})
 
 
 # "Expressions" block
@@ -487,6 +529,7 @@ class SpreadElement(Node):
     def __init__(self, loc: Optional[SourceLocation], argument: Expression):
         super().__init__("SpreadElement", loc)
         self.argument = argument
+        self._fields.update({"argument": self.argument})
 
 
 class ThisExpression(Expression):
@@ -506,6 +549,7 @@ class ArrayExpression(Expression):
     ):
         super().__init__("ArrayExpression", loc)
         self.elements = elements
+        self._fields.update({"elements": self.elements})
 
 
 class ObjectExpression(Expression):
@@ -514,6 +558,7 @@ class ObjectExpression(Expression):
     def __init__(self, loc: Optional[SourceLocation], properties: List[Property]):
         super().__init__("ObjectExpression", loc)
         self.properties = properties
+        self._fields.update({"properties": self.properties})
 
 
 class FunctionExpression(Function, Expression):
@@ -541,6 +586,7 @@ class ArrowFunctionExpression(Function, Expression):
     ):
         super().__init__("ArrowFunctionExpression", loc, None, params, body)
         self.expression = expression
+        self._fields.update({"expression": self.expression})
 
 
 class UnaryExpression(Expression):
@@ -557,6 +603,13 @@ class UnaryExpression(Expression):
         self.operator = operator
         self.prefix = prefix
         self.argument = argument
+        self._fields.update(
+            {
+                "operator": self.operator,
+                "prefix": self.prefix,
+                "argument": self.argument,
+            }
+        )
 
 
 class UpdateExpression(Expression):
@@ -573,6 +626,13 @@ class UpdateExpression(Expression):
         self.operator = operator
         self.argument = argument
         self.prefix = prefix
+        self._fields.update(
+            {
+                "operator": self.operator,
+                "argument": self.argument,
+                "prefix": self.prefix,
+            }
+        )
 
 
 class BinaryExpression(Expression):
@@ -589,6 +649,9 @@ class BinaryExpression(Expression):
         self.operator = operator
         self.left = left
         self.right = right
+        self._fields.update(
+            {"operator": self.operator, "left": self.left, "right": self.right}
+        )
 
 
 class AssignmentExpression(Expression):
@@ -607,6 +670,9 @@ class AssignmentExpression(Expression):
         self.operator = operator
         self.left = left
         self.right = right
+        self._fields.update(
+            {"operator": self.operator, "left": self.left, "right": self.right}
+        )
 
 
 class LogicalExpression(Expression):
@@ -623,6 +689,9 @@ class LogicalExpression(Expression):
         self.operator = operator
         self.left = left
         self.right = right
+        self._fields.update(
+            {"operator": self.operator, "left": self.left, "right": self.right}
+        )
 
 
 class MemberExpression(Expression, Pattern):
@@ -641,6 +710,13 @@ class MemberExpression(Expression, Pattern):
         self.object = member_object
         self.property = member_property
         self.computed = computed
+        self._fields.update(
+            {
+                "object": self.object,
+                "property": self.property,
+                "computed": self.computed,
+            }
+        )
 
 
 class ConditionalExpression(Expression):
@@ -657,6 +733,13 @@ class ConditionalExpression(Expression):
         self.test = test
         self.alternate = alternate
         self.consequent = consequent
+        self._fields.update(
+            {
+                "test": self.test,
+                "alternate": self.alternate,
+                "consequent": self.consequent,
+            }
+        )
 
 
 class CallExpression(Expression):
@@ -671,6 +754,7 @@ class CallExpression(Expression):
         super().__init__("CallExpression", loc)
         self.callee = callee
         self.arguments = arguments
+        self._fields.update({"callee": self.callee, "arguments": self.arguments})
 
 
 class NewExpression(Expression):
@@ -685,6 +769,7 @@ class NewExpression(Expression):
         super().__init__("NewExpression", loc)
         self.callee = callee
         self.arguments = arguments
+        self._fields.update({"callee": self.callee, "arguments": self.arguments})
 
 
 class SequenceExpression(Expression):
@@ -693,6 +778,7 @@ class SequenceExpression(Expression):
     def __init__(self, loc: Optional[SourceLocation], expressions: List[Expression]):
         super().__init__("SequenceExpression", loc)
         self.expressions = expressions
+        self._fields.update({"expressions": self.expressions})
 
 
 def _generate_unary_expression(operator: UnaryOperator, docstring: str):
@@ -940,6 +1026,16 @@ class Property(Node):
         self.method = method
         self.shorthand = shorthand
         self.computed = computed
+        self._fields.update(
+            {
+                "key": self.key,
+                "value": self.value,
+                "kind": self.kind,
+                "method": self.method,
+                "shorthand": self.shorthand,
+                "computed": self.computed,
+            }
+        )
 
 
 class AssignmentProperty(Property):
@@ -978,6 +1074,7 @@ class ObjectPattern(Pattern):
     ):
         super().__init__("ObjectPattern", loc)
         self.properties = properties
+        self._fields.update({"properties": self.properties})
 
 
 class ArrayPattern(Pattern):
@@ -986,3 +1083,15 @@ class ArrayPattern(Pattern):
     ):
         super().__init__("ArrayPattern", loc)
         self.elements = elements
+        self._fields.update({"elements": self.elements})
+
+
+# "Identifier" block
+
+
+class Identifier(Expression, Pattern):
+    """An identifier. Note that an identifier may be an expression or a destructuring pattern."""
+
+    def __init__(self, loc: Optional[SourceLocation], name: str):
+        super().__init__("Identifier", loc)
+        self.name = name
