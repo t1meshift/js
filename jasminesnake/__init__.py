@@ -3,7 +3,7 @@ So here it is.
 """
 import logging
 
-__version__ = "0.0.2"
+__version__ = "0.0.7"
 __snake__ = r"""
    _________         _________
   /         \       /         \

@@ -10,7 +10,7 @@ import coloredlogs
 from jasminesnake import __version__, __snake__, LOG_LEVELS
 from .js_stream import JSBaseStream, JSStringStream, JSFileStream
 from .lex.ErrorListeners import LogErrorListener
-import ast
+from ast import nodes, to_ascii_tree, from_parse_tree
 
 
 def create_argument_parser():
@@ -70,8 +70,12 @@ def main():
             stream = JSFileStream(args.infile, LogErrorListener())
 
         tree = stream.parse()
-        ast_tree = ast.from_parse_tree(tree)
 
+        ast_tree = from_parse_tree(tree)
+        ascii_ast = to_ascii_tree(ast_tree)
+
+        logging.debug("Got an AST!")
+        logging.debug(ascii_ast)
         # TODO: run logic
         sys.exit(0)
 
@@ -92,7 +96,11 @@ def main():
             tree = stream.parse()
             logging.debug("Got tree %s", tree.toStringTree(stream.parser.ruleNames))
 
-            ast_tree = ast.from_parse_tree(tree)
+            ast_tree = from_parse_tree(tree)
+            ascii_ast = to_ascii_tree(ast_tree)
+
+            logging.debug("Got an AST!")
+            logging.debug(ascii_ast)
             # TODO: run logic
     except EOFError:
         print("Ctrl-D received, shutting down...")
