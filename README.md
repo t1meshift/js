@@ -28,6 +28,9 @@ python -m jasminesnake
 
 ## Credits
 
+ESTree specification:
+[https://github.com/estree/estree/](https://github.com/estree/estree/)
+
 JavaScript grammar source: 
 [https://github.com/antlr/grammars-v4/tree/master/javascript/javascript](https://github.com/antlr/grammars-v4/tree/master/javascript/javascript)
 
