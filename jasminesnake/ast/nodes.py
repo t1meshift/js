@@ -180,6 +180,10 @@ class SourceLocation:
         self.start = start
         self.end = end
 
+    @property
+    def fields(self):
+        return OrderedDict({"start": self.start, "end": self.end})
+
     def __str__(self):
         src = "" if self.source is None else f"{self.source}:"
         return f"{src}{str(self.start)}"
