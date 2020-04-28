@@ -10,7 +10,7 @@ import coloredlogs
 from jasminesnake import __version__, __snake__, LOG_LEVELS
 from .js_stream import JSBaseStream, JSStringStream, JSFileStream
 from .lex.ErrorListeners import LogErrorListener
-from ast import nodes, to_ascii_tree, from_parse_tree
+from .ast import to_ascii_tree, from_parse_tree
 
 
 def create_argument_parser():
