@@ -2,31 +2,29 @@ import logging
 from typing import Optional, List, Union
 import antlr4.ParserRuleContext
 
-from lex.JavaScriptParser import JavaScriptParser
-from lex.JavaScriptParserListener import JavaScriptParserListener as JSBaseListener
+from ..lex.JavaScriptParser import JavaScriptParser
+from ..lex.JavaScriptParserListener import JavaScriptParserListener as JSBaseListener
 
-import ast.nodes
+from . import nodes
 
 
 def _get_source_location(
     ctx: antlr4.ParserRuleContext, source: Optional[str]
-) -> ast.nodes.SourceLocation:
+) -> nodes.SourceLocation:
     """Internal function to obtain `SourceObject` from parser context."""
-    start_pos = ast.nodes.Position(ctx.start.line, ctx.start.column)
-    end_pos = ast.nodes.Position(ctx.stop.line, ctx.stop.column)
+    start_pos = nodes.Position(ctx.start.line, ctx.start.column)
+    end_pos = nodes.Position(ctx.stop.line, ctx.stop.column)
 
     # If an end is not on a newline, shift end position column by 1
     # to match exact token end, not the last character
     if end_pos.column != 0:
         end_pos.column += 1
 
-    return ast.nodes.SourceLocation(source=source, start=start_pos, end=end_pos)
+    return nodes.SourceLocation(source=source, start=start_pos, end=end_pos)
 
 
 class AssignableListener(JSBaseListener):
-    _result: Union[
-        ast.nodes.Identifier, ast.nodes.ObjectPattern, ast.nodes.ArrayPattern
-    ]
+    _result: Union[nodes.Identifier, nodes.ObjectPattern, nodes.ArrayPattern]
 
     @property
     def result(self):
@@ -39,7 +37,7 @@ class AssignableListener(JSBaseListener):
     def enterIdentifier(self, ctx: JavaScriptParser.IdentifierContext):
         logging.debug("Entered section Identifier")
         loc = _get_source_location(ctx, None)
-        self._result = ast.nodes.Identifier(loc, ctx.getText())
+        self._result = nodes.Identifier(loc, ctx.getText())
 
     def enterArrayLiteral(self, ctx: JavaScriptParser.ArrayLiteralContext):
         logging.debug("Entered section ArrayLiteral")
@@ -51,7 +49,7 @@ class AssignableListener(JSBaseListener):
 
 
 class VariableDeclarationListener(JSBaseListener):
-    _var_decl: ast.nodes.VariableDeclarator
+    _var_decl: nodes.VariableDeclarator
 
     @property
     def var_declarator(self):
@@ -64,16 +62,16 @@ class VariableDeclarationListener(JSBaseListener):
         assign_listener = AssignableListener()
         ctx.assignable().enterRule(assign_listener)
         # ctx.singleExpression().enterRule(expression_listener)  # FIXME No ExpressionListener yet
-        self._var_decl = ast.nodes.VariableDeclarator(
+        self._var_decl = nodes.VariableDeclarator(
             loc, assign_listener.result, None
         )  # FIXME
 
 
 class StatementListener(JSBaseListener):
-    _stmt: ast.nodes.Statement
+    _stmt: nodes.Statement
 
     @property
-    def statement(self) -> ast.nodes.Statement:
+    def statement(self) -> nodes.Statement:
         """Statement AST node generated after parse tree walking."""
 
         return self._stmt
@@ -87,14 +85,14 @@ class StatementListener(JSBaseListener):
         """Listener for BlockStatement."""
         logging.debug("Entered section Block")
 
-        stmt_list: List[ast.nodes.Statement] = []
+        stmt_list: List[nodes.Statement] = []
         for stmt in ctx.statementList().children:
             stmt_listener = StatementListener()
             stmt.enterRule(stmt_listener)
             stmt_list.append(stmt_listener.statement)
 
         loc = _get_source_location(ctx, None)  # FIXME source param is None
-        self._stmt = ast.nodes.BlockStatement(loc, stmt_list)
+        self._stmt = nodes.BlockStatement(loc, stmt_list)
 
     def enterVariableStatement(self, ctx: JavaScriptParser.VariableStatementContext):
         logging.debug("Entered section VariableStatement")
@@ -106,8 +104,8 @@ class StatementListener(JSBaseListener):
         """Listener for VariableDeclaration."""
         logging.debug("Entered section VariableDeclaration")
 
-        var_modifier: ast.nodes.VarDeclKind = ctx.varModifier().getText()
-        var_decls: List[ast.nodes.VariableDeclarator] = []
+        var_modifier: nodes.VarDeclKind = ctx.varModifier().getText()
+        var_decls: List[nodes.VariableDeclarator] = []
 
         for var_decl in ctx.variableDeclaration():
             var_decl_listener = VariableDeclarationListener()
@@ -115,7 +113,7 @@ class StatementListener(JSBaseListener):
             var_decls.append(var_decl_listener.var_declarator)
 
         loc = _get_source_location(ctx, None)
-        self._stmt = ast.nodes.VariableDeclaration(loc, var_modifier, var_decls)
+        self._stmt = nodes.VariableDeclaration(loc, var_modifier, var_decls)
 
     def enterEmptyStatement(self, ctx: JavaScriptParser.EmptyStatementContext):
         """Listener for EmptyStatement."""
@@ -149,10 +147,10 @@ class StatementListener(JSBaseListener):
 class SourceElementListener(JSBaseListener):
     """The proxy between Program and Statement."""
 
-    _elems: List[ast.nodes.Statement] = []
+    _elems: List[nodes.Statement] = []
 
     @property
-    def source_elements(self) -> List[ast.nodes.Statement]:
+    def source_elements(self) -> List[nodes.Statement]:
         """Source elements AST nodes generated after parse tree walking."""
 
         return self._elems
@@ -168,22 +166,22 @@ class SourceElementListener(JSBaseListener):
 class ASTListener(JSBaseListener):
     """AST listener."""
 
-    _program_node: Optional[ast.nodes.Program] = None
-    _source_type: ast.nodes.SourceTypeLiteral
+    _program_node: Optional[nodes.Program] = None
+    _source_type: nodes.SourceTypeLiteral
 
     @property
-    def program_node(self) -> ast.nodes.Program:
+    def program_node(self) -> nodes.Program:
         """The `Program` AST node generated after parse tree walking."""
         if self._program_node is None:
             raise ValueError("Program AST node is None, did you run the listener?")
 
         return self._program_node
 
-    def __init__(self, source_type: ast.nodes.SourceTypeLiteral = "script"):
+    def __init__(self, source_type: nodes.SourceTypeLiteral = "script"):
         """AST listener constructor.
 
         Args:
-            source_type (ast.nodes.SourceTypeLiteral): source type. Could be `script` or `module`. Set to
+            source_type (nodes.SourceTypeLiteral): source type. Could be `script` or `module`. Set to
                 `script` by default.
         """
         self._source_type = source_type
@@ -204,6 +202,6 @@ class ASTListener(JSBaseListener):
             elem.enterRule(source_elem_listener)
 
         loc = _get_source_location(ctx, None)  # FIXME add source name
-        self._program_node = ast.nodes.Program(
+        self._program_node = nodes.Program(
             loc, self._source_type, source_elem_listener.source_elements
         )

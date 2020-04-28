@@ -4,14 +4,14 @@ from enum import Enum
 from typing import Union
 from antlr4 import ParseTreeWalker
 
-import lex.JavaScriptParser as Parser
-import ast.nodes
+import jasminesnake.lex.JavaScriptParser as Parser
+from . import nodes
 from .parse_tree_listeners import ASTListener
 
 JSP = Parser.JavaScriptParser
 
 
-def from_parse_tree(tree: JSP.ProgramContext) -> ast.nodes.Program:
+def from_parse_tree(tree: JSP.ProgramContext) -> nodes.Program:
     """Generate AST from ANTLR parse tree.
 
     Args:
@@ -26,7 +26,7 @@ def from_parse_tree(tree: JSP.ProgramContext) -> ast.nodes.Program:
 
 
 def to_ascii_tree(
-    node: Union[ast.nodes.Position, ast.nodes.SourceLocation, ast.nodes.Node],
+    node: Union[nodes.Position, nodes.SourceLocation, nodes.Node],
     name_prefix: str = "",
     nesting_lvl: int = 0,
 ):
