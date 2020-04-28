@@ -12,7 +12,7 @@ The module lacks support of:
     * generators/yield statement
     * for-of statement
     * template literals
- * ES2016 features:
+ * ES2017 features:
     * basically, all of them
 
 More about ESTree standard:
@@ -91,6 +91,7 @@ class BinaryOperator(Enum):
     AND = "&"
     IN = "in"
     INSTANCEOF = "instanceof"
+    POW = "**"
 
 
 class AssignmentOperator(Enum):
@@ -108,6 +109,7 @@ class AssignmentOperator(Enum):
     OR = "|="
     XOR = "^="
     AND = "&="
+    POW = "**="
 
 
 class LogicalOperator(Enum):
@@ -959,6 +961,9 @@ InExpression = _generate_binary_expression(BinaryOperator.IN, """An "in" express
 InstanceofExpression = _generate_binary_expression(
     BinaryOperator.INSTANCEOF, """An "instanceof" expression."""
 )
+PowBinaryExpression = _generate_binary_expression(
+    BinaryOperator.POW, """A power expression, e.g. ``2**3``."""
+)
 SimpleAssignExpression = _generate_assignment_expression(
     AssignmentOperator.ASSIGN, """An assignment done with operator ``=`` expression."""
 )
@@ -1001,6 +1006,9 @@ XorAssignExpression = _generate_assignment_expression(
 AndAssignExpression = _generate_assignment_expression(
     AssignmentOperator.AND,
     """A "bit and" assignment done with operator ``&=`` expression.""",
+)
+PowAssignExpression = _generate_assignment_expression(
+    AssignmentOperator.POW, """A power assignment expression, e.g. ``x**=2``."""
 )
 OrLogicExpression = _generate_logical_expression(
     LogicalOperator.OR, """An "or" logical expression."""
