@@ -8,17 +8,19 @@ The module lacks support of:
     * debugger statement
     * with statement
     * RegExp
- * ES6 features:
+ * ES2015 features:
     * generators/yield statement
     * for-of statement
     * template literals
-    * and other ES6 features :)
+ * ES2016 features:
+    * basically, all of them
 
 More about ESTree standard:
 https://github.com/estree/estree/
 
 Todo:
     * Add support for lacking features
+    * Make another attempt to split up this module
 """
 
 from typing import List, Union, Optional, Literal as TypeLiteral, TypedDict, Any
@@ -41,6 +43,9 @@ VarDeclKind = TypeLiteral["var", "let", "const"]
 
 PropKind = TypeLiteral["init", "get", "set"]
 """A type for a `kind` field of `Property`."""
+
+MethodDefinitionKind = TypeLiteral["constructor", "method", "get", "set"]
+"""A type for a `kind` field of `MethodDefinition`."""
 
 
 class UnaryOperator(Enum):
@@ -1090,6 +1095,21 @@ class ArrayPattern(Pattern):
         self._fields.update({"elements": self.elements})
 
 
+class RestElement(Pattern):
+    def __init__(self, loc: Optional[SourceLocation], argument: Pattern):
+        super().__init__("RestElement", loc)
+        self.argument = argument
+        self._fields.update({"argument": self.argument})
+
+
+class AssignmentPattern(Pattern):
+    def __init__(self, loc: Optional[SourceLocation], left: Pattern, right: Expression):
+        super().__init__("AssignmentPattern", loc)
+        self.left = left
+        self.right = right
+        self._fields.update({"left": self.left, "right": self.right})
+
+
 # "Identifier" block
 
 
@@ -1100,3 +1120,256 @@ class Identifier(Expression, Pattern):
         super().__init__("Identifier", loc)
         self.name = name
         self._fields.update({"name": self.name})
+
+
+# "Classes" block
+
+
+class MethodDefinition(Node):
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        key: Expression,
+        value: FunctionExpression,
+        kind: MethodDefinitionKind,
+        computed: bool,
+        static: bool,
+    ):
+        super().__init__("MethodDefinition", loc)
+        self.key = key
+        self.value = value
+        self.kind = kind
+        self.computed = computed
+        self.static = static
+        self._fields.update(
+            {
+                "key": self.key,
+                "value": self.value,
+                "kind": self.kind,
+                "computed": self.computed,
+                "static": self.static,
+            }
+        )
+
+
+class ClassBody(Node):
+    def __init__(self, loc: Optional[SourceLocation], body: List[MethodDefinition]):
+        super().__init__("ClassBody", loc)
+        self.body = body
+        self._fields.update({"body": self.body})
+
+
+class Class(Node):
+    def __init__(
+        self,
+        node_type: str,
+        loc: Optional[SourceLocation],
+        class_id: Optional[Identifier],
+        super_class: Optional[Expression],
+        body: ClassBody,
+    ):
+        super().__init__(node_type, loc)
+        self.id = class_id
+        self.super_class = super_class
+        self.body = body
+        self._fields.update(
+            {"id": self.id, "superClass": self.super_class, "body": self.body}
+        )
+
+
+class ClassDeclaration(Class, Declaration):
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        class_id: Identifier,
+        super_class: Optional[Expression],
+        body: ClassBody,
+    ):
+        super().__init__("ClassDeclaration", loc, class_id, super_class, body)
+
+
+class ClassExpression(Class, Expression):
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        class_id: Optional[Identifier],
+        super_class: Optional[Expression],
+        body: ClassBody,
+    ):
+        super().__init__("ClassExpression", loc, class_id, super_class, body)
+
+
+class MetaProperty(Expression):
+    """`MetaProperty` node represents ``new.target`` meta property in ES2015.
+    In the future, it will represent other meta properties as well.
+    """
+
+    def __init__(
+        self, loc: Optional[SourceLocation], meta: Identifier, meta_property: Identifier
+    ):
+        super().__init__("MetaProperty", loc)
+        self.meta = (meta,)
+        self.property = meta_property
+        self._fields.update({"meta": self.meta, "property": self.property})
+
+
+# "Modules" block
+
+
+class ModuleDeclaration(Node):
+    """A module ``import`` or ``export`` declaration."""
+
+    def __init__(self, node_type: str, loc: Optional[SourceLocation]):
+        super().__init__(node_type, loc)
+
+
+class ModuleSpecifier(Node):
+    """A specifier in an import or export declaration."""
+
+    def __init__(
+        self, node_type: str, loc: Optional[SourceLocation], local: Identifier
+    ):
+        super().__init__(node_type, loc)
+        self.local = local
+        self._fields.update({"local": self.local})
+
+
+class ImportSpecifier(ModuleSpecifier):
+    """An imported variable binding, e.g., ``{foo}`` in ``import {foo} from "mod"``
+    or ``{foo as bar}`` in ``import {foo as bar} from "mod"``. The `imported` field
+    refers to the name of the export imported from the module. The `local` field
+    refers to the binding imported into the local module scope. If it is a basic named
+    import, such as in ``import {foo} from "mod"``, both `imported` and `local` are
+    equivalent `Identifier` nodes; in this case an `Identifier` node representing ``foo``.
+    If it is an aliased import, such as in ``import {foo as bar} from "mod"``, the
+    `imported` field is an `Identifier` node representing ``foo``, and the `local` field 
+    is an `Identifier` node representing ``bar``.
+    """
+
+    def __init__(
+        self, loc: Optional[SourceLocation], local: Identifier, imported: Identifier
+    ):
+        super().__init__("ImportSpecifier", loc, local)
+        self.imported = imported
+        self._fields.update({"imported": self.imported})
+
+
+class ImportDefaultSpecifier(ModuleSpecifier):
+    """A default import specifier, e.g., ``foo`` in ``import foo from "mod.js"``."""
+
+    def __init__(self, loc: Optional[SourceLocation], local: Identifier):
+        super().__init__("ImportDefaultSpecifier", loc, local)
+
+
+class ImportNamespaceSpecifier(ModuleSpecifier):
+    """A namespace import specifier, e.g., ``* as foo`` in ``import * as foo from "mod.js"``."""
+
+    def __init__(self, loc: Optional[SourceLocation], local: Identifier):
+        super().__init__("ImportNamespaceSpecifier", loc, local)
+
+
+class ImportDeclaration(ModuleDeclaration):
+    """An import declaration, e.g., ``import foo from "mod";``."""
+
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        specifiers: List[
+            Union[ImportSpecifier, ImportDefaultSpecifier, ImportNamespaceSpecifier]
+        ],
+        source: Literal,
+    ):
+        super().__init__("ImportDeclaration", loc)
+        self.specifiers = specifiers
+        self.source = source
+        self._fields.update({"specifiers": self.specifiers, "source": self.source})
+
+
+class ExportSpecifier(ModuleSpecifier):
+    """An exported variable binding, e.g., ``{foo}`` in ``export {foo}`` or ``{bar as foo}``
+    in ``export {bar as foo}``. The `exported` field refers to the name exported in the module.
+    The `local` field refers to the binding into the local module scope. If it is a basic named
+    export, such as in ``export {foo}``, both `exported` and `local` are equivalent `Identifier`
+    nodes; in this case an `Identifier` node representing ``foo``. If it is an aliased export,
+    such as in ``export {bar as foo}``, the `exported` field is an `Identifier` node representing
+    ``foo``, and the `local` field is an `Identifier` node representing ``bar``.
+    """
+
+    def __init__(
+        self, loc: Optional[SourceLocation], local: Identifier, exported: Identifier
+    ):
+        super().__init__("ExportSpecifier", loc, local)
+        self.exported = exported
+        self._fields.update({"exported": self.exported})
+
+
+class ExportNamedDeclaration(ModuleDeclaration):
+    """An export named declaration, e.g., ``export {foo, bar};``, ``export {foo} from "mod";``
+    or ``export var foo = 1;``.
+
+    Notes:
+        Having `declaration` populated with non-empty `specifiers` or non-null `source` results
+        in an invalid state.
+    """
+
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        declaration: Optional[Declaration],
+        specifiers: List[ExportSpecifier],
+        source: Optional[Literal],
+    ):
+        super().__init__("ExportNamedDeclaration", loc)
+        self.declaration = declaration
+        self.specifiers = specifiers
+        self.source = source
+        self._fields.update(
+            {
+                "declaration": self.declaration,
+                "specifiers": self.specifiers,
+                "source": self.source,
+            }
+        )
+
+
+class AnonymousDefaultExportedFunctionDeclaration(Function):
+    def __init__(
+        self, loc: Optional[SourceLocation], params: List[Pattern], body: FunctionBody
+    ):
+        super().__init__("FunctionDeclaration", loc, None, params, body)
+
+
+class AnonymousDefaultExportedClassDeclaration(Class):
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        super_class: Optional[Expression],
+        body: ClassBody,
+    ):
+        super().__init__("ClassDeclaration", loc, None, super_class, body)
+
+
+class ExportDefaultDeclaration(ModuleDeclaration):
+    """An export default declaration, e.g., ``export default function () {};`` or ``export default 1;``."""
+
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        declaration: Union[
+            AnonymousDefaultExportedFunctionDeclaration,
+            FunctionDeclaration,
+            AnonymousDefaultExportedClassDeclaration,
+            ClassDeclaration,
+            Expression,
+        ],
+    ):
+        super().__init__("ExportDefaultDeclaration", loc)
+        self.declaration = declaration
+        self._fields.update({"declaration": self.declaration})
+
+
+class ExportAllDeclaration(ModuleDeclaration):
+    def __init__(self, loc: Optional[SourceLocation], source: Literal):
+        super().__init__("ExportAllDeclaration", loc)
+        self.source = source
+        self._fields.update({"source": self.source})
