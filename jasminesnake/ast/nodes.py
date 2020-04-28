@@ -1099,3 +1099,4 @@ class Identifier(Expression, Pattern):
     def __init__(self, loc: Optional[SourceLocation], name: str):
         super().__init__("Identifier", loc)
         self.name = name
+        self._fields.update({"name": self.name})
