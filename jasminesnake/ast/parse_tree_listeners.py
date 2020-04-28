@@ -118,6 +118,8 @@ class StatementListener(JSBaseListener):
     def enterEmptyStatement(self, ctx: JavaScriptParser.EmptyStatementContext):
         """Listener for EmptyStatement."""
         logging.debug("Entered section EmptyStatement")
+        loc = _get_source_location(ctx, None)
+        self._stmt = nodes.EmptyStatement(loc)
         pass
 
     def enterExpressionStatement(
