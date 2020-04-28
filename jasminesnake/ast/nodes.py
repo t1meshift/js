@@ -19,7 +19,8 @@ The module lacks support of:
     * for-await-of statement
     * template literals
  * ES2019 features
- * ES2020 features
+    * catch binding omission.
+      The only ES2019 feature.
 
 More about ESTree standard:
 https://github.com/estree/estree/
@@ -29,7 +30,7 @@ Todo:
     * Make another attempt to split up this module
 """
 
-from typing import List, Union, Optional, Literal as TypeLiteral, TypedDict, Any
+from typing import List, Union, Optional, Literal as TypeLiteral, Any
 from enum import Enum
 from collections import OrderedDict
 
@@ -38,8 +39,11 @@ from collections import OrderedDict
 
 # Custom types used in the nodes
 
-number = Union[int, float]
-"""A type union consisting of int and float Python types. Consider it as Number type from JavaScript."""
+number = float
+"""A type representing Number type in JavaScript."""
+
+bigint = int
+"""A type representing BigInt type in JavaScript."""
 
 SourceTypeLiteral = TypeLiteral["script", "module"]
 """The type for the `sourceType` field."""
@@ -123,6 +127,7 @@ class LogicalOperator(Enum):
 
     OR = "||"
     AND = "&&"
+    NULLISH_COALESCING = "??"
 
 
 # Nodes forward declarations
@@ -155,6 +160,10 @@ class Property:
 
 
 class Identifier:
+    ...
+
+
+class Literal:
     ...
 
 
@@ -229,20 +238,6 @@ class Node:
     @property
     def fields(self):
         return self._fields
-
-
-# "Literal" block
-
-
-class Literal(Expression):
-    """A literal token. Note that a literal can be an expression."""
-
-    def __init__(
-        self, loc: Optional[SourceLocation], value: Union[str, bool, number, None]
-    ):
-        super().__init__("Literal", loc)
-        self.value = value
-        self._fields.update({"value": self.value})
 
 
 # "Programs" block
@@ -1026,6 +1021,42 @@ OrLogicExpression = _generate_logical_expression(
 AndLogicExpression = _generate_logical_expression(
     LogicalOperator.AND, """An "and" logical expression."""
 )
+NullishCoalescingLogicExpression = _generate_logical_expression(
+    LogicalOperator.NULLISH_COALESCING, """A nullish coalescing logical expression."""
+)
+
+
+# "Literal" block
+
+
+class Literal(Expression):
+    """A literal token. Note that a literal can be an expression."""
+
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        value: Union[str, bool, number, bigint, None],
+    ):
+        super().__init__("Literal", loc)
+        self.value = value
+        self._fields.update({"value": self.value})
+
+
+class BigIntLiteral(Literal):
+    """`bigint` property is the string representation of the ``BigInt`` value. It doesn't include the suffix ``n``.
+    In environments that don't support ``BigInt`` values, value property will be `None` as the ``BigInt`` value can't
+    be represented natively.
+    """
+
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        value: Union[str, bool, number, bigint, None],
+        bigint: str,
+    ):
+        super().__init__(loc, value)
+        self.bigint = bigint
+        self._fields.update({"bigint": self.bigint})
 
 
 # "Property" block
@@ -1069,7 +1100,7 @@ class AssignmentProperty(Property):
     def __init__(
         self,
         loc: Optional[SourceLocation],
-        key: Union[Literal, Identifier],
+        key: Expression,
         value: Pattern,
         shorthand: bool,
         computed: bool,
@@ -1300,6 +1331,18 @@ class ImportDeclaration(ModuleDeclaration):
         self._fields.update({"specifiers": self.specifiers, "source": self.source})
 
 
+class ImportExpression(Expression):
+    """`ImportExpression` node represents Dynamic Imports such as ``import(source)``.
+    The `source` property is the importing source as similar to ImportDeclaration node,
+    but it can be an arbitrary expression node.
+    """
+
+    def __init__(self, loc: Optional[SourceLocation], source: Expression):
+        super().__init__("ImportExpression", loc)
+        self.source = source
+        self._fields.update({"source": self.source})
+
+
 class ExportSpecifier(ModuleSpecifier):
     """An exported variable binding, e.g., ``{foo}`` in ``export {foo}`` or ``{bar as foo}``
     in ``export {bar as foo}``. The `exported` field refers to the name exported in the module.
@@ -1384,7 +1427,19 @@ class ExportDefaultDeclaration(ModuleDeclaration):
 
 
 class ExportAllDeclaration(ModuleDeclaration):
-    def __init__(self, loc: Optional[SourceLocation], source: Literal):
+    """An export batch declaration, e.g., ``export * from "mod";``.
+
+    The `exported` property contains an `Identifier` when a different exported 
+    name is specified using ``as``, e.g., ``export * as foo from "mod";``.
+    """
+
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        source: Literal,
+        exported: Optional[Identifier],
+    ):
         super().__init__("ExportAllDeclaration", loc)
         self.source = source
-        self._fields.update({"source": self.source})
+        self.exported = exported
+        self._fields.update({"source": self.source, "exported": self.exported})
