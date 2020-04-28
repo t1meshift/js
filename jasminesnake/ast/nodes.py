@@ -13,7 +13,13 @@ The module lacks support of:
     * for-of statement
     * template literals
  * ES2017 features:
-    * basically, all of them
+    * async/await.
+      Basically, the whole standard consists of it, so no ES2017 support.
+ * ES2018 features:
+    * for-await-of statement
+    * template literals
+ * ES2019 features
+ * ES2020 features
 
 More about ESTree standard:
 https://github.com/estree/estree/
@@ -566,7 +572,11 @@ class ArrayExpression(Expression):
 class ObjectExpression(Expression):
     """An object expression."""
 
-    def __init__(self, loc: Optional[SourceLocation], properties: List[Property]):
+    def __init__(
+        self,
+        loc: Optional[SourceLocation],
+        properties: List[Union[Property, SpreadElement]],
+    ):
         super().__init__("ObjectExpression", loc)
         self.properties = properties
         self._fields.update({"properties": self.properties})
@@ -1080,14 +1090,18 @@ class Pattern(Node):
         super().__init__(node_type, loc)
 
 
-class ObjectPatternKeyValue(TypedDict):
-    key: Union[Literal, Identifier]
-    value: Pattern
+class RestElement(Pattern):
+    def __init__(self, loc: Optional[SourceLocation], argument: Pattern):
+        super().__init__("RestElement", loc)
+        self.argument = argument
+        self._fields.update({"argument": self.argument})
 
 
 class ObjectPattern(Pattern):
     def __init__(
-        self, loc: Optional[SourceLocation], properties: List[ObjectPatternKeyValue]
+        self,
+        loc: Optional[SourceLocation],
+        properties: List[Union[AssignmentProperty, RestElement]],
     ):
         super().__init__("ObjectPattern", loc)
         self.properties = properties
@@ -1101,13 +1115,6 @@ class ArrayPattern(Pattern):
         super().__init__("ArrayPattern", loc)
         self.elements = elements
         self._fields.update({"elements": self.elements})
-
-
-class RestElement(Pattern):
-    def __init__(self, loc: Optional[SourceLocation], argument: Pattern):
-        super().__init__("RestElement", loc)
-        self.argument = argument
-        self._fields.update({"argument": self.argument})
 
 
 class AssignmentPattern(Pattern):
