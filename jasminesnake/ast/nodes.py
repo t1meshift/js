@@ -1029,7 +1029,7 @@ class Property(Node):
     def __init__(
         self,
         loc: Optional[SourceLocation],
-        key: Union[Literal, Identifier],
+        key: Expression,
         value: Expression,
         kind: PropKind,
         method: bool,
