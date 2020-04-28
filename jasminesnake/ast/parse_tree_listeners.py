@@ -1,3 +1,11 @@
+"""Parse tree listeners.
+
+Basically, you should use ASTListener(source_type: SourceTypeLiteral) in most cases.
+
+Todo:
+    * Fill `source` field in SourceLocation and pass it to each `_get_source_location()` call.
+    * Compare `SourceLocation` creation behavior with the one in Acorn/ESPrima
+"""
 import logging
 from typing import Optional, List, Union
 import antlr4.ParserRuleContext
@@ -41,11 +49,11 @@ class AssignableListener(JSBaseListener):
 
     def enterArrayLiteral(self, ctx: JavaScriptParser.ArrayLiteralContext):
         logging.debug("Entered section ArrayLiteral")
-        pass  # TODO
+        raise NotImplementedError("ArrayLiteral assignment")  # TODO
 
     def enterObjectLiteral(self, ctx: JavaScriptParser.ObjectLiteralContext):
         logging.debug("Entered section ObjectLiteral")
-        pass  # TODO
+        raise NotImplementedError("ObjectLiteral assignment")  # TODO
 
 
 class VariableDeclarationListener(JSBaseListener):
@@ -61,10 +69,14 @@ class VariableDeclarationListener(JSBaseListener):
         loc = _get_source_location(ctx, None)
         assign_listener = AssignableListener()
         ctx.assignable().enterRule(assign_listener)
+
+        if ctx.singleExpression() is not None:
+            raise NotImplementedError("VariableDeclarator initialization")
+
         # ctx.singleExpression().enterRule(expression_listener)  # FIXME No ExpressionListener yet
-        self._var_decl = nodes.VariableDeclarator(
-            loc, assign_listener.result, None
-        )  # FIXME
+        init = None  # value from ExpressionListener
+
+        self._var_decl = nodes.VariableDeclarator(loc, assign_listener.result, init)
 
 
 class StatementListener(JSBaseListener):
@@ -91,7 +103,7 @@ class StatementListener(JSBaseListener):
             stmt.enterRule(stmt_listener)
             stmt_list.append(stmt_listener.statement)
 
-        loc = _get_source_location(ctx, None)  # FIXME source param is None
+        loc = _get_source_location(ctx, None)
         self._stmt = nodes.BlockStatement(loc, stmt_list)
 
     def enterVariableStatement(self, ctx: JavaScriptParser.VariableStatementContext):
@@ -129,11 +141,12 @@ class StatementListener(JSBaseListener):
         TODO: check up expression containers.
         """
         logging.debug("Entered section ExpressionStatement")
-        pass
+        raise NotImplementedError("ExpressionStatement")
 
     def enterIfStatement(self, ctx: JavaScriptParser.IfStatementContext):
         """Listener for IfStatement."""
         logging.debug("Entered section IfStatement")
+        raise NotImplementedError("ExpressionStatement")  # FIXME
         pass
 
     def enterFunctionDeclaration(
@@ -141,7 +154,7 @@ class StatementListener(JSBaseListener):
     ):
         """Listener for FunctionDeclaration."""
         logging.debug("Entered section FunctionDeclaration")
-        pass
+        raise NotImplementedError("FunctionDeclaration")
 
     # TODO: import/export, ClassDeclaration, iter statements, continue. break, return
 
