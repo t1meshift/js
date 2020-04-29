@@ -1059,6 +1059,35 @@ class BigIntLiteral(Literal):
         self._fields.update({"bigint": self.bigint})
 
 
+class NullLiteral(Literal):
+    def __init__(self, loc: Optional[SourceLocation]):
+        super().__init__(loc, None)
+
+    def __str__(self):
+        return "null"
+
+
+class BooleanLiteral(Literal):
+    def __init__(self, loc: Optional[SourceLocation], value: bool):
+        super().__init__(loc, value)
+
+    def __str__(self):
+        return str(self.value).lower()
+
+
+class StringLiteral(Literal):
+    def __init__(self, loc: Optional[SourceLocation], value: str):
+        super().__init__(loc, value)
+
+    def __str__(self):
+        return f'"{self.value}"'
+
+
+class NumericLiteral(Literal):
+    def __init__(self, loc: Optional[SourceLocation], value: number):
+        super().__init__(loc, value)
+
+
 # "Property" block
 
 
