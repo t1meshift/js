@@ -37,7 +37,7 @@ options { superClass=JavaScriptBaseLexer; }
 HashBangLine:                   { self.isStartOfFile()}? '#!' ~[\r\n\u2028\u2029]*; // only allowed at start
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
-RegularExpressionLiteral:       '/' RegularExpressionFirstChar RegularExpressionChar* {self.isRegexPossible()}? '/' IdentifierPart*;
+//RegularExpressionLiteral:       '/' RegularExpressionFirstChar RegularExpressionChar* {self.isRegexPossible()}? '/' IdentifierPart*;
 
 OpenBracket:                    '[';
 CloseBracket:                   ']';

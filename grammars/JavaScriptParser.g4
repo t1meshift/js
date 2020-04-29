@@ -403,7 +403,7 @@ literal
     | BooleanLiteral
     | StringLiteral
 //    | TemplateStringLiteral
-    | RegularExpressionLiteral
+//    | RegularExpressionLiteral
     | numericLiteral
     | bigintLiteral
     ;
