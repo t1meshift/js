@@ -6,9 +6,11 @@ Todo:
     * Fill `source` field in SourceLocation and pass it to each `_get_source_location()` call.
     * Compare `SourceLocation` creation behavior with the one in Acorn/ESPrima
 """
+
 import logging
 from typing import Optional, List, Union
 import antlr4.ParserRuleContext
+from antlr4 import ErrorNode, ParserRuleContext
 
 from ..lex.JavaScriptParser import JavaScriptParser
 from ..lex.JavaScriptParserListener import JavaScriptParserListener as JSBaseListener
@@ -31,7 +33,78 @@ def _get_source_location(
     return nodes.SourceLocation(source=source, start=start_pos, end=end_pos)
 
 
-class AssignableListener(JSBaseListener):
+class NodeListener(JSBaseListener):
+    def visitErrorNode(self, node: ErrorNode):
+        pass
+
+    def enterEveryRule(self, ctx: ParserRuleContext):
+        pass
+
+
+class LiteralListener(JSBaseListener):
+    _literal: nodes.Literal
+
+    @property
+    def literal(self):
+        return self._literal
+
+    def enterLiteral(self, ctx: JavaScriptParser.LiteralContext):
+        loc = _get_source_location(ctx, None)
+        if ctx.NullLiteral() is not None:
+            self._literal = nodes.NullLiteral(loc)
+        elif ctx.BooleanLiteral() is not None:
+            value = ctx.BooleanLiteral().getText() == "true"
+            self._literal = nodes.BooleanLiteral(loc, value)
+        elif ctx.StringLiteral() is not None:
+            self._literal = nodes.StringLiteral(loc, ctx.StringLiteral().getText())
+        else:
+            ctx.getChild(0).enterRule(self)
+
+    def enterNumericLiteral(self, ctx: JavaScriptParser.NumericLiteralContext):
+        # Thank you, PEP-515, very cool!
+        loc = _get_source_location(ctx, None)
+        value = float(ctx.DecimalLiteral().getText())
+        self._literal = nodes.NumericLiteral(loc, value)
+
+    def enterBigintLiteral(self, ctx: JavaScriptParser.BigintLiteralContext):
+        raise NotImplementedError("Bigint literals")
+
+
+class ExpressionListener(JSBaseListener):
+    _expr: nodes.Expression
+
+    @property
+    def expression(self):
+        return self._expr
+
+    def enterExpressionStatement(
+        self, ctx: JavaScriptParser.ExpressionStatementContext
+    ):
+        ctx.expressionSequence().enterRule(self)
+
+    def enterExpressionSequence(self, ctx: JavaScriptParser.ExpressionSequenceContext):
+        expressions: List[nodes.Expression] = []
+        loc = _get_source_location(ctx, None)
+        for expr in ctx.singleExpression():
+            expr_listener = ExpressionListener()
+            expr.enterRule(expr_listener)
+            expressions.append(expr_listener.expression)
+        self._expr = nodes.SequenceExpression(loc, expressions)
+
+    def enterParenthesizedExpression(
+        self, ctx: JavaScriptParser.ParenthesizedExpressionContext
+    ):
+        ctx.expressionSequence().enterRule(self)
+
+    def enterLiteralExpression(self, ctx: JavaScriptParser.LiteralExpressionContext):
+        literal_listener = LiteralListener()
+        ctx.literal().enterRule(literal_listener)
+        self._expr = literal_listener.literal
+
+    # TODO single expression
+
+
+class AssignableListener(NodeListener):
     _result: Union[nodes.Identifier, nodes.ObjectPattern, nodes.ArrayPattern]
 
     @property
@@ -70,11 +143,11 @@ class VariableDeclarationListener(JSBaseListener):
         assign_listener = AssignableListener()
         ctx.assignable().enterRule(assign_listener)
 
+        init = None  # or value from ExpressionListener
         if ctx.singleExpression() is not None:
-            raise NotImplementedError("VariableDeclarator initialization")
-
-        # ctx.singleExpression().enterRule(expression_listener)  # FIXME No ExpressionListener yet
-        init = None  # value from ExpressionListener
+            expression_listener = ExpressionListener()
+            ctx.singleExpression().enterRule(expression_listener)
+            init = expression_listener.expression
 
         self._var_decl = nodes.VariableDeclarator(loc, assign_listener.result, init)
 
@@ -87,6 +160,17 @@ class StatementListener(JSBaseListener):
         """Statement AST node generated after parse tree walking."""
 
         return self._stmt
+
+    def __init__(self, in_loop: bool = False, in_func: bool = False):
+        """
+        Statement listener. Generates a Statement.
+
+        Args:
+            in_loop (bool): allow `continue` and `break` statements
+            in_func (bool): allow `return` statement
+        """
+        self._in_loop = in_loop
+        self._in_func = in_func
 
     def enterStatement(self, ctx: JavaScriptParser.StatementContext):
         """Obtain an actual statement."""
@@ -137,17 +221,17 @@ class StatementListener(JSBaseListener):
     def enterExpressionStatement(
         self, ctx: JavaScriptParser.ExpressionStatementContext
     ):
-        """Listener for ExpressionStatement.
-        TODO: check up expression containers.
-        """
+        """Listener for ExpressionStatement."""
         logging.debug("Entered section ExpressionStatement")
-        raise NotImplementedError("ExpressionStatement")
+        expr_listener = ExpressionListener()
+        ctx.expressionSequence().enterRule(expr_listener)
+        loc = _get_source_location(ctx, None)
+        self._stmt = nodes.ExpressionStatement(loc, expr_listener.expression)
 
     def enterIfStatement(self, ctx: JavaScriptParser.IfStatementContext):
         """Listener for IfStatement."""
         logging.debug("Entered section IfStatement")
-        raise NotImplementedError("ExpressionStatement")  # FIXME
-        pass
+        raise NotImplementedError("IfStatement")
 
     def enterFunctionDeclaration(
         self, ctx: JavaScriptParser.FunctionDeclarationContext
@@ -156,7 +240,54 @@ class StatementListener(JSBaseListener):
         logging.debug("Entered section FunctionDeclaration")
         raise NotImplementedError("FunctionDeclaration")
 
-    # TODO: import/export, ClassDeclaration, iter statements, continue. break, return
+    def enterDoStatement(self, ctx: JavaScriptParser.DoStatementContext):
+        """Listener for DoStatement (do-while)."""
+        raise NotImplementedError("DoWhileStatement")
+
+    def enterWhileStatement(self, ctx: JavaScriptParser.WhileStatementContext):
+        """Listener for WhileStatement."""
+        logging.debug("Entered section WhileStatement")
+        raise NotImplementedError("WhileStatement")
+
+    def enterForStatement(self, ctx: JavaScriptParser.ForStatementContext):
+        """Listener for ForStatement."""
+        logging.debug("Entered section ForStatement")
+        raise NotImplementedError("ForStatement")
+
+    def enterForInStatement(self, ctx: JavaScriptParser.ForInStatementContext):
+        """Listener for ForInStatement."""
+        logging.debug("Entered section ForInStatement")
+        raise NotImplementedError("ForInStatement")
+
+    def enterContinueStatement(self, ctx: JavaScriptParser.ContinueStatementContext):
+        logging.debug("Entered section ContinueStatement")
+        raise NotImplementedError("ContinueStatement")
+
+    def enterBreakStatement(self, ctx: JavaScriptParser.BreakStatementContext):
+        logging.debug("Entered BreakStatement")
+        raise NotImplementedError("BreakStatement")
+
+    def enterReturnStatement(self, ctx: JavaScriptParser.ReturnStatementContext):
+        logging.debug("Entered ReturnStatement")
+        raise NotImplementedError("ReturnStatement")
+
+    def enterImportStatement(self, ctx: JavaScriptParser.ImportStatementContext):
+        logging.debug("Entered ImportStatement")
+        raise NotImplementedError("ImportStatement")
+
+    def enterExportDeclaration(self, ctx: JavaScriptParser.ExportDeclarationContext):
+        logging.debug("Entered ExportDeclaration")
+        raise NotImplementedError("ExportDeclaration")
+
+    def enterExportDefaultDeclaration(
+        self, ctx: JavaScriptParser.ExportDefaultDeclarationContext
+    ):
+        logging.debug("Entered ExportDefaultDeclaration")
+        raise NotImplementedError("ExportDefaultDeclaration")
+
+    def enterClassDeclaration(self, ctx: JavaScriptParser.ClassDeclarationContext):
+        logging.debug("Entered ClassDeclaration")
+        raise NotImplementedError("ClassDeclaration")
 
 
 class SourceElementListener(JSBaseListener):

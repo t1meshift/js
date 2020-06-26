@@ -3,7 +3,7 @@ So here it is.
 """
 import logging
 
-__version__ = "0.0.7"
+__version__ = "0.0.9"
 __snake__ = r"""
    _________         _________
   /         \       /         \
@@ -31,5 +31,6 @@ LOG_LEVELS = {
         "format": u"[%(asctime)s] [%(levelname)s] %(filename)s:%(lineno)d: %(message)s",
     },
 }
+
 
 # TODO: make it usable as a module too

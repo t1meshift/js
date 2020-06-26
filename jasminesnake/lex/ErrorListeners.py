@@ -1,15 +1,19 @@
 from antlr4.error.ErrorListener import ErrorListener
 import logging
 
+from antlr4.error.Errors import ParseCancellationException
+
 
 class LogErrorListener(ErrorListener):
     def __init__(self):
         super().__init__()
 
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-        logging.debug(
-            "{}\n{}\n{}\n{}\n{}".format(offendingSymbol, line, column, msg, e)
-        )
+        logging.critical("SyntaxError: %s", msg)
+        raise ParseCancellationException("Syntax Error lol")
+        # logging.debug(
+        #     "{}\n{}\n{}\n{}\n{}".format(offendingSymbol, line, column, msg, e)
+        # )
 
     def reportAmbiguity(
         self, recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs

@@ -11,7 +11,7 @@ Another JavaScript interpreter written on Python 3.
 
 To run tests:
 
-- pylint
+- pytest
 - Tox
 
 You can get ANTLR [here](https://www.antlr.org/), other dependencies could be installed with pip:
