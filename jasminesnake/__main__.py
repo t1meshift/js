@@ -21,6 +21,9 @@ def create_argument_parser():
 
     _arg_parser.add_argument("--snake", action="store_true", help="print a snake")
     _arg_parser.add_argument(
+        "--ast", choices=["full", "short", "none"], default="none", help="print AST"
+    )
+    _arg_parser.add_argument(
         "--verbose",
         "-v",
         action="count",
@@ -72,9 +75,12 @@ def main():
         tree = stream.parse()
 
         ast_tree = from_parse_tree(tree)
-        ascii_ast = to_ascii_tree(ast_tree)
 
-        logging.info("Got an AST!\n%s", ascii_ast)
+        logging.info("Got an AST!\n")
+        if args.ast != "none":
+            ascii_ast = to_ascii_tree(ast_tree, ast_format=args.ast)
+            print(ascii_ast)
+
         # TODO: run logic
         sys.exit(0)
 
