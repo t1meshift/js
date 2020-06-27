@@ -41,6 +41,36 @@ class NodeListener(JSBaseListener):
         pass
 
 
+class AssignmentOperatorListener(JSBaseListener):
+    _op: nodes.AssignmentOperator
+
+    @property
+    def oper(self):
+        return self._op
+
+    def enterAssignmentOperator(self, ctx: JavaScriptParser.AssignmentOperatorContext):
+        ops = nodes.AssignmentOperator
+        ops_list = [
+            (ctx.MultiplyAssign(), ops.MUL),
+            (ctx.DivideAssign(), ops.DIV),
+            (ctx.ModulusAssign(), ops.MOD),
+            (ctx.PlusAssign(), ops.ADD),
+            (ctx.MinusAssign(), ops.SUB),
+            (ctx.LeftShiftArithmeticAssign(), ops.SHL),
+            (ctx.RightShiftArithmeticAssign(), ops.SHR),
+            (ctx.RightShiftLogicalAssign(), ops.SHR_LOGIC),
+            (ctx.BitAndAssign(), ops.AND),
+            (ctx.BitXorAssign(), ops.XOR),
+            (ctx.BitOrAssign(), ops.OR),
+            (ctx.PowerAssign(), ops.POW),
+        ]
+
+        for (op_cond, op) in ops_list:
+            if op_cond is not None:
+                self._op = op
+                break
+
+
 class LiteralListener(JSBaseListener):
     _literal: nodes.Literal
 
@@ -70,6 +100,34 @@ class LiteralListener(JSBaseListener):
         raise NotImplementedError("Bigint literals")
 
 
+class ArrayLiteralExpandListener(JSBaseListener):
+    _exprs: List[Union[nodes.Expression, nodes.SpreadElement]]
+
+    @property
+    def expressions(self):
+        return self._exprs
+
+    def enterArrayLiteral(self, ctx: JavaScriptParser.ArrayLiteralContext):
+        logging.debug("Entered section ArrayLiteral")
+        ctx.elementList().enterRule(self)
+
+    def enterElementList(self, ctx: JavaScriptParser.ElementListContext):
+        logging.debug("Entered section ElementList")
+        self._exprs = []
+        for expr in ctx.arrayElement():
+            expr.enterRule(self)
+
+    def enterArrayElement(self, ctx: JavaScriptParser.ArrayElementContext):
+        logging.debug("Entered section ArrayElement")
+        expr_listener = ExpressionListener()
+        ctx.singleExpression().enterRule(expr_listener)
+        if ctx.Ellipsis() is not None:
+            loc = _get_source_location(ctx, None)
+            self._exprs.append(nodes.SpreadElement(loc, expr_listener.expression))
+        else:
+            self._exprs.append(expr_listener.expression)
+
+
 class ExpressionListener(JSBaseListener):
     _expr: nodes.Expression
 
@@ -81,6 +139,7 @@ class ExpressionListener(JSBaseListener):
         self, ctx: JavaScriptParser.ExpressionStatementContext
     ):
         ctx.expressionSequence().enterRule(self)
+        raise NotImplementedError("ExpressionStatement")
 
     def enterExpressionSequence(self, ctx: JavaScriptParser.ExpressionSequenceContext):
         expressions: List[nodes.Expression] = []
@@ -95,13 +154,239 @@ class ExpressionListener(JSBaseListener):
         self, ctx: JavaScriptParser.ParenthesizedExpressionContext
     ):
         ctx.expressionSequence().enterRule(self)
+        raise NotImplementedError("ParenthesizedExpression")
 
     def enterLiteralExpression(self, ctx: JavaScriptParser.LiteralExpressionContext):
         literal_listener = LiteralListener()
         ctx.literal().enterRule(literal_listener)
         self._expr = literal_listener.literal
 
-    # TODO single expression
+    def enterFunctionExpression(self, ctx: JavaScriptParser.FunctionExpressionContext):
+        logging.debug("Entered section FunctionExpression")
+        raise NotImplementedError("FunctionExpression")  # TODO
+
+    def enterClassExpression(self, ctx: JavaScriptParser.ClassExpressionContext):
+        logging.debug("Entered section ClassExpression")
+        raise NotImplementedError("ClassExpression")  # TODO
+
+    def enterMemberIndexExpression(
+        self, ctx: JavaScriptParser.MemberIndexExpressionContext
+    ):
+        logging.debug("Entered section MemberIndexExpression")
+        raise NotImplementedError("MemberIndexExpression")  # TODO
+
+    def enterMemberDotExpression(
+        self, ctx: JavaScriptParser.MemberDotExpressionContext
+    ):
+        logging.debug("Entered section MemberDotExpression")
+        raise NotImplementedError("MemberDotExpression")  # TODO
+
+    def enterArgumentsExpression(
+        self, ctx: JavaScriptParser.ArgumentsExpressionContext
+    ):
+        logging.debug("Entered section ArgumentsExpression")
+        raise NotImplementedError("ArgumentsExpression")  # TODO
+
+    def enterNewExpression(self, ctx: JavaScriptParser.NewExpressionContext):
+        logging.debug("Entered section NewExpression")
+        raise NotImplementedError("NewExpression")  # TODO
+
+    def enterMetaExpression(self, ctx: JavaScriptParser.MetaExpressionContext):
+        logging.debug("Entered section MetaExpression")
+        raise NotImplementedError("MetaExpression")  # TODO
+
+    def enterPostIncrementExpression(
+        self, ctx: JavaScriptParser.PostIncrementExpressionContext
+    ):
+        logging.debug("Entered section PostIncrementExpression")
+        raise NotImplementedError("PostIncrementExpression")  # TODO
+
+    def enterPostDecreaseExpression(
+        self, ctx: JavaScriptParser.PostDecreaseExpressionContext
+    ):
+        logging.debug("Entered section PostDecreaseExpression")
+        raise NotImplementedError("PostDecreaseExpression")  # TODO
+
+    def enterDeleteExpression(self, ctx: JavaScriptParser.DeleteExpressionContext):
+        logging.debug("Entered section DeleteExpression")
+        raise NotImplementedError("DeleteExpression")  # TODO
+
+    def enterVoidExpression(self, ctx: JavaScriptParser.VoidExpressionContext):
+        logging.debug("Entered section VoidExpression")
+        raise NotImplementedError("VoidExpression")  # TODO
+
+    def enterTypeofExpression(self, ctx: JavaScriptParser.TypeofExpressionContext):
+        logging.debug("Entered section TypeofExpression")
+        raise NotImplementedError("TypeofExpression")  # TODO
+
+    def enterPreIncrementExpression(
+        self, ctx: JavaScriptParser.PreIncrementExpressionContext
+    ):
+        logging.debug("Entered section PreIncrementExpression")
+        raise NotImplementedError("PreIncrementExpression")  # TODO
+
+    def enterPreDecreaseExpression(
+        self, ctx: JavaScriptParser.PreDecreaseExpressionContext
+    ):
+        logging.debug("Entered section PreDecreaseExpression")
+        raise NotImplementedError("PreDecreaseExpression")  # TODO
+
+    def enterUnaryPlusExpression(
+        self, ctx: JavaScriptParser.UnaryPlusExpressionContext
+    ):
+        logging.debug("Entered section UnaryPlusExpression")
+        raise NotImplementedError("UnaryPlusExpression")  # TODO
+
+    def enterUnaryMinusExpression(
+        self, ctx: JavaScriptParser.UnaryMinusExpressionContext
+    ):
+        logging.debug("Entered section UnaryMinusExpression")
+        raise NotImplementedError("UnaryMinusExpression")  # TODO
+
+    def enterBitNotExpression(self, ctx: JavaScriptParser.BitNotExpressionContext):
+        logging.debug("Entered section BitNotExpression")
+        raise NotImplementedError("BitNotExpression")  # TODO
+
+    def enterNotExpression(self, ctx: JavaScriptParser.NotExpressionContext):
+        logging.debug("Entered section NotExpression")
+        raise NotImplementedError("NotExpression")  # TODO
+
+    def enterPowerExpression(self, ctx: JavaScriptParser.PowerExpressionContext):
+        logging.debug("Entered section PowerExpression")
+        raise NotImplementedError("PowerExpression")  # TODO
+
+    def enterMultiplicativeExpression(
+        self, ctx: JavaScriptParser.MultiplicativeExpressionContext
+    ):
+        logging.debug("Entered section MultiplicativeExpression")
+        raise NotImplementedError("MultiplicativeExpression")  # TODO
+
+    def enterAdditiveExpression(self, ctx: JavaScriptParser.AdditiveExpressionContext):
+        logging.debug("Entered section AdditiveExpression")
+        raise NotImplementedError("AdditiveExpression")  # TODO
+
+    def enterCoalesceExpression(self, ctx: JavaScriptParser.CoalesceExpressionContext):
+        logging.debug("Entered section MemberIndexExpression")
+        raise NotImplementedError("MemberIndexExpression")  # TODO
+
+    def enterBitShiftExpression(self, ctx: JavaScriptParser.BitShiftExpressionContext):
+        logging.debug("Entered section BitShiftExpression")
+        raise NotImplementedError("BitShiftExpression")  # TODO
+
+    def enterRelationalExpression(
+        self, ctx: JavaScriptParser.RelationalExpressionContext
+    ):
+        logging.debug("Entered section RelationalExpression")
+        raise NotImplementedError("RelationalExpression")  # TODO
+
+    def enterInExpression(self, ctx: JavaScriptParser.InExpressionContext):
+        logging.debug("Entered section InExpression")
+        raise NotImplementedError("InExpression")  # TODO
+
+    def enterEqualityExpression(self, ctx: JavaScriptParser.EqualityExpressionContext):
+        logging.debug("Entered section EqualityExpression")
+        raise NotImplementedError("EqualityExpression")  # TODO
+
+    def enterBitAndExpression(self, ctx: JavaScriptParser.BitAndExpressionContext):
+        logging.debug("Entered section BitAndExpression")
+        raise NotImplementedError("BitAndExpression")  # TODO
+
+    def enterBitOrExpression(self, ctx: JavaScriptParser.BitOrExpressionContext):
+        logging.debug("Entered section BitOrExpression")
+        raise NotImplementedError("BitOrExpression")  # TODO
+
+    def enterBitXOrExpression(self, ctx: JavaScriptParser.BitXOrExpressionContext):
+        logging.debug("Entered section BitXOrExpression")
+        raise NotImplementedError("BitXOrExpression")  # TODO
+
+    def enterLogicalAndExpression(
+        self, ctx: JavaScriptParser.LogicalAndExpressionContext
+    ):
+        logging.debug("Entered section LogicalAndExpression")
+        raise NotImplementedError("LogicalAndExpression")  # TODO
+
+    def enterLogicalOrExpression(
+        self, ctx: JavaScriptParser.LogicalOrExpressionContext
+    ):
+        logging.debug("Entered section LogicalOrExpression")
+        raise NotImplementedError("LogicalOrExpression")  # TODO
+
+    def enterTernaryExpression(self, ctx: JavaScriptParser.TernaryExpressionContext):
+        logging.debug("Entered section TernaryExpression")
+        raise NotImplementedError("TernaryExpression")  # TODO
+
+    def enterAssignmentExpression(
+        self, ctx: JavaScriptParser.AssignmentExpressionContext
+    ):
+        logging.debug("Entered section AssignmentExpression")
+        left_lst = ExpressionListener()
+        right_lst = ExpressionListener()
+        ctx.singleExpression(0).enterRule(left_lst)
+        ctx.singleExpression(1).enterRule(right_lst)
+
+        loc = _get_source_location(ctx, None)
+        left = left_lst.expression
+        right = right_lst.expression
+        self._expr = nodes.AssignmentExpression(
+            loc, nodes.AssignmentOperator.ASSIGN, left, right
+        )
+
+    def enterAssignmentOperatorExpression(
+        self, ctx: JavaScriptParser.AssignmentOperatorExpressionContext
+    ):
+        logging.debug("Entered section AssignmentOperatorExpression")
+        left_lst = ExpressionListener()
+        right_lst = ExpressionListener()
+        op_lst = AssignmentOperatorListener()
+        ctx.singleExpression(0).enterRule(left_lst)
+        ctx.singleExpression(1).enterRule(right_lst)
+        ctx.assignmentOperator().enterRule(op_lst)
+
+        loc = _get_source_location(ctx, None)
+        left = left_lst.expression
+        right = right_lst.expression
+        op = op_lst.oper
+        self._expr = nodes.AssignmentExpression(loc, op, left, right)
+
+    def enterImportExpression(self, ctx: JavaScriptParser.ImportExpressionContext):
+        logging.debug("Entered section ImportExpression")
+        raise NotImplementedError("ImportExpression")  # TODO
+
+    def enterThisExpression(self, ctx: JavaScriptParser.ThisExpressionContext):
+        logging.debug("Entered section ThisExpression")
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.ThisExpression(loc)
+
+    def enterIdentifierExpression(
+        self, ctx: JavaScriptParser.IdentifierExpressionContext
+    ):
+        logging.debug("Entered section IdentifierExpression")
+        ctx.identifier().enterRule(self)
+
+    def enterIdentifier(self, ctx: JavaScriptParser.IdentifierContext):
+        logging.debug("Entered section Identifier")
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.Identifier(loc, ctx.getText())
+
+    def enterSuperExpression(self, ctx: JavaScriptParser.SuperExpressionContext):
+        logging.debug("Entered section SuperExpression")
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.Super(loc)
+
+    def enterArrayLiteralExpression(
+        self, ctx: JavaScriptParser.ArrayLiteralExpressionContext
+    ):
+        logging.debug("Entered section ArrayLiteralExpression")
+        arr_expand_lst = ArrayLiteralExpandListener()
+        ctx.arrayLiteral().enterRule(arr_expand_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.ArrayExpression(loc, arr_expand_lst.expressions)
+
+    def enterObjectLiteralExpression(
+        self, ctx: JavaScriptParser.ObjectLiteralExpressionContext
+    ):
+        logging.debug("Entered section ObjectLiteralExpression")
+        raise NotImplementedError("ObjectLiteralExpression")  # TODO
 
 
 class AssignableListener(NodeListener):
@@ -122,7 +407,15 @@ class AssignableListener(NodeListener):
 
     def enterArrayLiteral(self, ctx: JavaScriptParser.ArrayLiteralContext):
         logging.debug("Entered section ArrayLiteral")
-        raise NotImplementedError("ArrayLiteral assignment")  # TODO
+        loc = _get_source_location(ctx, None)
+
+        elems = []
+        if ctx.elementList() is not None:
+            arr_exp_lst = ArrayLiteralExpandListener()
+            ctx.elementList().enterRule(arr_exp_lst)
+            elems += arr_exp_lst.expressions
+
+        self._result = nodes.ArrayPattern(loc, elems)
 
     def enterObjectLiteral(self, ctx: JavaScriptParser.ObjectLiteralContext):
         logging.debug("Entered section ObjectLiteral")
