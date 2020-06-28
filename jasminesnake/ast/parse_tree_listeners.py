@@ -200,85 +200,193 @@ class ExpressionListener(JSBaseListener):
         self, ctx: JavaScriptParser.PostIncrementExpressionContext
     ):
         logging.debug("Entered section PostIncrementExpression")
-        raise NotImplementedError("PostIncrementExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.PostIncrementExpression(loc, arg_lst.expression)
 
     def enterPostDecreaseExpression(
         self, ctx: JavaScriptParser.PostDecreaseExpressionContext
     ):
         logging.debug("Entered section PostDecreaseExpression")
-        raise NotImplementedError("PostDecreaseExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.PostDecrementExpression(loc, arg_lst.expression)
 
     def enterDeleteExpression(self, ctx: JavaScriptParser.DeleteExpressionContext):
         logging.debug("Entered section DeleteExpression")
-        raise NotImplementedError("DeleteExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.DeleteExpression(loc, arg_lst.expression)
 
     def enterVoidExpression(self, ctx: JavaScriptParser.VoidExpressionContext):
         logging.debug("Entered section VoidExpression")
-        raise NotImplementedError("VoidExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.VoidExpression(loc, arg_lst.expression)
 
     def enterTypeofExpression(self, ctx: JavaScriptParser.TypeofExpressionContext):
         logging.debug("Entered section TypeofExpression")
-        raise NotImplementedError("TypeofExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.TypeofExpression(loc, arg_lst.expression)
 
     def enterPreIncrementExpression(
         self, ctx: JavaScriptParser.PreIncrementExpressionContext
     ):
         logging.debug("Entered section PreIncrementExpression")
-        raise NotImplementedError("PreIncrementExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.PreIncrementExpression(loc, arg_lst.expression)
 
     def enterPreDecreaseExpression(
         self, ctx: JavaScriptParser.PreDecreaseExpressionContext
     ):
         logging.debug("Entered section PreDecreaseExpression")
-        raise NotImplementedError("PreDecreaseExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.PreDecrementExpression(loc, arg_lst.expression)
 
     def enterUnaryPlusExpression(
         self, ctx: JavaScriptParser.UnaryPlusExpressionContext
     ):
         logging.debug("Entered section UnaryPlusExpression")
-        raise NotImplementedError("UnaryPlusExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.UnaryPlusExpression(loc, arg_lst.expression)
 
     def enterUnaryMinusExpression(
         self, ctx: JavaScriptParser.UnaryMinusExpressionContext
     ):
         logging.debug("Entered section UnaryMinusExpression")
-        raise NotImplementedError("UnaryMinusExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.UnaryMinusExpression(loc, arg_lst.expression)
 
     def enterBitNotExpression(self, ctx: JavaScriptParser.BitNotExpressionContext):
         logging.debug("Entered section BitNotExpression")
-        raise NotImplementedError("BitNotExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.UnaryBitNotExpression(loc, arg_lst.expression)
 
     def enterNotExpression(self, ctx: JavaScriptParser.NotExpressionContext):
         logging.debug("Entered section NotExpression")
-        raise NotImplementedError("NotExpression")  # TODO
+        arg_lst = ExpressionListener()
+        ctx.singleExpression().enterRule(arg_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.UnaryLogicNotExpression(loc, arg_lst.expression)
 
     def enterPowerExpression(self, ctx: JavaScriptParser.PowerExpressionContext):
         logging.debug("Entered section PowerExpression")
-        raise NotImplementedError("PowerExpression")  # TODO
+        arg_l_lst = ExpressionListener()
+        arg_r_lst = ExpressionListener()
+        ctx.singleExpression(0).enterRule(arg_l_lst)
+        ctx.singleExpression(1).enterRule(arg_r_lst)
+        loc = _get_source_location(ctx, None)
+        self._expr = nodes.PowBinaryExpression(
+            loc, arg_l_lst.expression, arg_r_lst.expression
+        )
 
     def enterMultiplicativeExpression(
         self, ctx: JavaScriptParser.MultiplicativeExpressionContext
     ):
         logging.debug("Entered section MultiplicativeExpression")
-        raise NotImplementedError("MultiplicativeExpression")  # TODO
+
+        ops_list = [
+            (ctx.Multiply(), nodes.MulArithmeticExpression),
+            (ctx.Divide(), nodes.DivArithmeticExpression),
+            (ctx.Modulus(), nodes.ModArithmeticExpression),
+        ]
+
+        arg_l_lst = ExpressionListener()
+        arg_r_lst = ExpressionListener()
+        ctx.singleExpression(0).enterRule(arg_l_lst)
+        ctx.singleExpression(1).enterRule(arg_r_lst)
+
+        loc = _get_source_location(ctx, None)
+
+        for (op_cond, op) in ops_list:
+            if op_cond is not None:
+                self._expr = op(loc, arg_l_lst.expression, arg_r_lst.expression)
+                break
 
     def enterAdditiveExpression(self, ctx: JavaScriptParser.AdditiveExpressionContext):
         logging.debug("Entered section AdditiveExpression")
-        raise NotImplementedError("AdditiveExpression")  # TODO
+
+        ops_list = [
+            (ctx.Plus(), nodes.AddArithmeticExpression),
+            (ctx.Minus(), nodes.SubArithmeticExpression),
+        ]
+
+        arg_l_lst = ExpressionListener()
+        arg_r_lst = ExpressionListener()
+        ctx.singleExpression(0).enterRule(arg_l_lst)
+        ctx.singleExpression(1).enterRule(arg_r_lst)
+
+        loc = _get_source_location(ctx, None)
+
+        for (op_cond, op) in ops_list:
+            if op_cond is not None:
+                self._expr = op(loc, arg_l_lst.expression, arg_r_lst.expression)
+                break
 
     def enterCoalesceExpression(self, ctx: JavaScriptParser.CoalesceExpressionContext):
-        logging.debug("Entered section MemberIndexExpression")
-        raise NotImplementedError("MemberIndexExpression")  # TODO
+        logging.debug("Entered section CoalesceExpression")
+        raise NotImplementedError("CoalesceExpression")  # TODO
 
     def enterBitShiftExpression(self, ctx: JavaScriptParser.BitShiftExpressionContext):
         logging.debug("Entered section BitShiftExpression")
-        raise NotImplementedError("BitShiftExpression")  # TODO
+
+        ops_list = [
+            (ctx.LeftShiftArithmetic(), nodes.LeftBitShiftExpression),
+            (ctx.RightShiftArithmetic(), nodes.RightBitShiftExpression),
+            (ctx.RightShiftLogical(), nodes.LogicRightBitShiftExpression),
+        ]
+
+        arg_l_lst = ExpressionListener()
+        arg_r_lst = ExpressionListener()
+        ctx.singleExpression(0).enterRule(arg_l_lst)
+        ctx.singleExpression(1).enterRule(arg_r_lst)
+
+        loc = _get_source_location(ctx, None)
+
+        for (op_cond, op) in ops_list:
+            if op_cond is not None:
+                self._expr = op(loc, arg_l_lst.expression, arg_r_lst.expression)
+                break
 
     def enterRelationalExpression(
         self, ctx: JavaScriptParser.RelationalExpressionContext
     ):
         logging.debug("Entered section RelationalExpression")
-        raise NotImplementedError("RelationalExpression")  # TODO
+
+        ops_list = [
+            (ctx.LessThan(), nodes.LowerThanRelationExpression),
+            (ctx.LessThanEquals(), nodes.LowerThanEqualRelationExpression),
+            (ctx.MoreThan(), nodes.GreaterThanRelationExpression),
+            (ctx.GreaterThanEquals(), nodes.GreaterThanEqualRelationExpression),
+        ]
+
+        arg_l_lst = ExpressionListener()
+        arg_r_lst = ExpressionListener()
+        ctx.singleExpression(0).enterRule(arg_l_lst)
+        ctx.singleExpression(1).enterRule(arg_r_lst)
+
+        loc = _get_source_location(ctx, None)
+
+        for (op_cond, op) in ops_list:
+            if op_cond is not None:
+                self._expr = op(loc, arg_l_lst.expression, arg_r_lst.expression)
+                break
 
     def enterInExpression(self, ctx: JavaScriptParser.InExpressionContext):
         logging.debug("Entered section InExpression")
@@ -286,7 +394,25 @@ class ExpressionListener(JSBaseListener):
 
     def enterEqualityExpression(self, ctx: JavaScriptParser.EqualityExpressionContext):
         logging.debug("Entered section EqualityExpression")
-        raise NotImplementedError("EqualityExpression")  # TODO
+
+        ops_list = [
+            (ctx.Equals_(), nodes.EqualityExpression),
+            (ctx.NotEquals(), nodes.NotEqualityExpression),
+            (ctx.IdentityEquals(), nodes.IdentityEqualityExpression),
+            (ctx.IdentityNotEquals(), nodes.NotIdentityEqualityExpression),
+        ]
+
+        arg_l_lst = ExpressionListener()
+        arg_r_lst = ExpressionListener()
+        ctx.singleExpression(0).enterRule(arg_l_lst)
+        ctx.singleExpression(1).enterRule(arg_r_lst)
+
+        loc = _get_source_location(ctx, None)
+
+        for (op_cond, op) in ops_list:
+            if op_cond is not None:
+                self._expr = op(loc, arg_l_lst.expression, arg_r_lst.expression)
+                break
 
     def enterBitAndExpression(self, ctx: JavaScriptParser.BitAndExpressionContext):
         logging.debug("Entered section BitAndExpression")
