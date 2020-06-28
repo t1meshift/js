@@ -1,0 +1,19 @@
+Program at 1:0
++-- sourceType: script
++-- body:
+|   +-- 0: VariableDeclaration at 1:0
+|   |   +-- kind: let
+|   |   +-- declarations:
+|   |   |   +-- 0: VariableDeclarator at 1:4
+|   |   |   |   +-- id: ArrayPattern at 1:4
+|   |   |   |   |   +-- elements:
+|   |   |   |   |   |   +-- 0: Identifier at 1:5
+|   |   |   |   |   |   |   +-- name: a
+|   |   |   |   |   |   +-- 1: Identifier at 1:8
+|   |   |   |   |   |   |   +-- name: b
+|   |   |   |   +-- init: ArrayExpression at 1:13
+|   |   |   |   |   +-- elements:
+|   |   |   |   |   |   +-- 0: Literal at 1:14
+|   |   |   |   |   |   |   +-- value: 4.0
+|   |   |   |   |   |   +-- 1: Literal at 1:17
+|   |   |   |   |   |   |   +-- value: 4.0

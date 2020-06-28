@@ -1,0 +1,38 @@
+Program at 1:0
++-- sourceType: script
++-- body:
+|   +-- 0: BlockStatement at 1:0
+|   |   +-- body:
+|   |   |   +-- 0: VariableDeclaration at 1:1
+|   |   |   |   +-- kind: let
+|   |   |   |   +-- declarations:
+|   |   |   |   |   +-- 0: VariableDeclarator at 1:5
+|   |   |   |   |   |   +-- id: Identifier at 1:5
+|   |   |   |   |   |   |   +-- name: a
+|   |   |   |   |   |   +-- init: Literal at 1:9
+|   |   |   |   |   |   |   +-- value: 15.0
+|   |   |   |   |   +-- 1: VariableDeclarator at 1:13
+|   |   |   |   |   |   +-- id: Identifier at 1:13
+|   |   |   |   |   |   |   +-- name: b
+|   |   |   |   |   |   +-- init: None
+|   |   |   +-- 1: BlockStatement at 1:16
+|   |   |   |   +-- body:
+|   |   |   |   |   +-- 0: ExpressionStatement at 1:17
+|   |   |   |   |   |   +-- expression: SequenceExpression at 1:17
+|   |   |   |   |   |   |   +-- expressions:
+|   |   |   |   |   |   |   |   +-- 0: Literal at 1:17
+|   |   |   |   |   |   |   |   |   +-- value: 1337.228
+|   |   |   |   |   |   |   |   +-- 1: false
+|   |   |   |   |   |   |   |   |   +-- value: False
+|   |   |   |   |   |   |   |   +-- 2: "String"
+|   |   |   |   |   |   |   |   |   +-- value: String
+|   |   |   +-- 2: EmptyStatement at 1:45
+|   |   |   +-- 3: BlockStatement at 1:47
+|   |   |   |   +-- body:
+|   |   |   |   |   +-- 0: VariableDeclaration at 1:48
+|   |   |   |   |   |   +-- kind: var
+|   |   |   |   |   |   +-- declarations:
+|   |   |   |   |   |   |   +-- 0: VariableDeclarator at 1:52
+|   |   |   |   |   |   |   |   +-- id: Identifier at 1:52
+|   |   |   |   |   |   |   |   |   +-- name: aaaaaaaaaaaaaa
+|   |   |   |   |   |   |   |   +-- init: None

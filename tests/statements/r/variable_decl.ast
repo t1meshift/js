@@ -1,0 +1,65 @@
+Program at 1:0
++-- sourceType: script
++-- body:
+|   +-- 0: VariableDeclaration at 1:0
+|   |   +-- kind: let
+|   |   +-- declarations:
+|   |   |   +-- 0: VariableDeclarator at 1:4
+|   |   |   |   +-- id: Identifier at 1:4
+|   |   |   |   |   +-- name: a
+|   |   |   |   +-- init: None
+|   +-- 1: VariableDeclaration at 2:0
+|   |   +-- kind: var
+|   |   +-- declarations:
+|   |   |   +-- 0: VariableDeclarator at 2:4
+|   |   |   |   +-- id: Identifier at 2:4
+|   |   |   |   |   +-- name: b
+|   |   |   |   +-- init: None
+|   +-- 2: VariableDeclaration at 4:0
+|   |   +-- kind: let
+|   |   +-- declarations:
+|   |   |   +-- 0: VariableDeclarator at 4:4
+|   |   |   |   +-- id: Identifier at 4:4
+|   |   |   |   |   +-- name: zzz
+|   |   |   |   +-- init: Literal at 4:10
+|   |   |   |   |   +-- value: 0.0
+|   |   |   +-- 1: VariableDeclarator at 4:13
+|   |   |   |   +-- id: Identifier at 4:13
+|   |   |   |   |   +-- name: k
+|   |   |   |   +-- init: None
+|   +-- 3: VariableDeclaration at 5:0
+|   |   +-- kind: let
+|   |   +-- declarations:
+|   |   |   +-- 0: VariableDeclarator at 5:4
+|   |   |   |   +-- id: Identifier at 5:4
+|   |   |   |   |   +-- name: cc
+|   |   |   |   +-- init: None
+|   |   |   +-- 1: VariableDeclarator at 5:8
+|   |   |   |   +-- id: Identifier at 5:8
+|   |   |   |   |   +-- name: asa
+|   |   |   |   +-- init: None
+|   +-- 4: VariableDeclaration at 6:0
+|   |   +-- kind: let
+|   |   +-- declarations:
+|   |   |   +-- 0: VariableDeclarator at 6:4
+|   |   |   |   +-- id: Identifier at 6:4
+|   |   |   |   |   +-- name: cccccc
+|   |   |   |   +-- init: None
+|   |   |   +-- 1: VariableDeclarator at 6:12
+|   |   |   |   +-- id: Identifier at 6:12
+|   |   |   |   |   +-- name: asasa
+|   |   |   |   +-- init: Literal at 6:20
+|   |   |   |   |   +-- value: 0.0
+|   +-- 5: VariableDeclaration at 8:0
+|   |   +-- kind: var
+|   |   +-- declarations:
+|   |   |   +-- 0: VariableDeclarator at 8:4
+|   |   |   |   +-- id: Identifier at 8:4
+|   |   |   |   |   +-- name: x
+|   |   |   |   +-- init: Literal at 8:8
+|   |   |   |   |   +-- value: 0.0
+|   |   |   +-- 1: VariableDeclarator at 8:11
+|   |   |   |   +-- id: Identifier at 8:11
+|   |   |   |   |   +-- name: y
+|   |   |   |   +-- init: Literal at 8:15
+|   |   |   |   |   +-- value: 0.0

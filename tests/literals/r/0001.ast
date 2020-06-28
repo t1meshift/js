@@ -1,0 +1,18 @@
+Program at 1:0
++-- sourceType: script
++-- body:
+|   +-- 0: ExpressionStatement at 1:0
+|   |   +-- expression: SequenceExpression at 1:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: ArrayExpression at 1:0
+|   |   |   |   |   +-- elements:
+|   |   |   |   |   |   +-- 0: Literal at 1:1
+|   |   |   |   |   |   |   +-- value: 4.0
+|   |   |   |   |   |   +-- 1: Literal at 1:3
+|   |   |   |   |   |   |   +-- value: 4.0
+|   |   |   |   |   |   +-- 2: Literal at 1:5
+|   |   |   |   |   |   |   +-- value: 4.0
+|   |   |   |   |   |   +-- 3: Literal at 1:7
+|   |   |   |   |   |   |   +-- value: 4.0
+|   |   |   |   |   |   +-- 4: Literal at 1:9
+|   |   |   |   |   |   |   +-- value: 4.0

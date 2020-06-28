@@ -1,0 +1,8 @@
+Program at 1:0
++-- sourceType: script
++-- body:
+|   +-- 0: ExpressionStatement at 1:0
+|   |   +-- expression: SequenceExpression at 1:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: " while executing client event 1"
+|   |   |   |   |   +-- value:  while executing client event 1

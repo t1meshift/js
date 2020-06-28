@@ -1,0 +1,33 @@
+Program at 1:0
++-- sourceType: script
++-- body:
+|   +-- 0: ExpressionStatement at 1:0
+|   |   +-- expression: SequenceExpression at 1:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: Literal at 1:0
+|   |   |   |   |   +-- value: 4444.0
+|   +-- 1: ExpressionStatement at 2:0
+|   |   +-- expression: SequenceExpression at 2:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: Literal at 2:0
+|   |   |   |   |   +-- value: 444444444.4444444
+|   +-- 2: ExpressionStatement at 3:0
+|   |   +-- expression: SequenceExpression at 3:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: Literal at 3:0
+|   |   |   |   |   +-- value: 4.0
+|   +-- 3: ExpressionStatement at 4:0
+|   |   +-- expression: SequenceExpression at 4:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: true
+|   |   |   |   |   +-- value: True
+|   +-- 4: ExpressionStatement at 5:0
+|   |   +-- expression: SequenceExpression at 5:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: false
+|   |   |   |   |   +-- value: False
+|   +-- 5: ExpressionStatement at 6:0
+|   |   +-- expression: SequenceExpression at 6:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: "String literal"
+|   |   |   |   |   +-- value: String literal

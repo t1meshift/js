@@ -12,7 +12,6 @@ Another JavaScript interpreter written on Python 3.
 To run tests:
 
 - pytest
-- Tox
 
 You can get ANTLR [here](https://www.antlr.org/), other dependencies could be installed with pip:
 ```bash
@@ -24,6 +23,12 @@ pip install -r requirements.txt # Use requirements-dev.txt if you want to run te
 ```bash
 antlr4 -Xexact-output-dir -o jasminesnake/lex -package lex -Dlanguage=Python3 -listener grammars/*.g4
 python -m jasminesnake
+```
+
+# Testing
+```bash
+# Running with -s is optional
+python -m pytest -s
 ```
 
 ## Credits

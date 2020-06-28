@@ -1,0 +1,1 @@
+'String literal, but single quoted'

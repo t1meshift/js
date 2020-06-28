@@ -1,0 +1,7 @@
+Program at 1:1
++-- sourceType: script
++-- body:
+|   +-- 0: EmptyStatement at 1:1
+|   +-- 1: EmptyStatement at 2:0
+|   +-- 2: EmptyStatement at 2:2
+|   +-- 3: EmptyStatement at 3:1

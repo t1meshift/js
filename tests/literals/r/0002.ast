@@ -1,0 +1,13 @@
+Program at 1:0
++-- sourceType: script
++-- body:
+|   +-- 0: ExpressionStatement at 1:0
+|   |   +-- expression: SequenceExpression at 1:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: ArrayExpression at 1:0
+|   |   |   |   |   +-- elements:
+|   |   |   |   |   |   +-- 0: SpreadElement at 1:1
+|   |   |   |   |   |   |   +-- argument: Identifier at 1:4
+|   |   |   |   |   |   |   |   +-- name: a
+|   |   |   |   |   |   +-- 1: Identifier at 1:7
+|   |   |   |   |   |   |   +-- name: b

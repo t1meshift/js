@@ -1,0 +1,32 @@
+Program at 1:0
++-- sourceType: script
++-- body:
+|   +-- 0: ExpressionStatement at 1:0
+|   |   +-- expression: SequenceExpression at 1:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: UpdateExpression at 1:0
+|   |   |   |   |   +-- operator: ++
+|   |   |   |   |   +-- argument: Identifier at 1:2
+|   |   |   |   |   |   +-- name: a
+|   |   |   |   |   +-- prefix: True
+|   +-- 1: ExpressionStatement at 1:5
+|   |   +-- expression: SequenceExpression at 1:5
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: UpdateExpression at 1:5
+|   |   |   |   |   +-- operator: ++
+|   |   |   |   |   +-- argument: Identifier at 1:5
+|   |   |   |   |   |   +-- name: b
+|   |   |   |   |   +-- prefix: False
+|   +-- 2: ExpressionStatement at 2:0
+|   |   +-- expression: SequenceExpression at 2:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: UpdateExpression at 2:0
+|   |   |   |   |   +-- operator: --
+|   |   |   |   |   +-- argument: Identifier at 2:0
+|   |   |   |   |   |   +-- name: a
+|   |   |   |   |   +-- prefix: False
+|   |   |   |   +-- 1: UpdateExpression at 2:5
+|   |   |   |   |   +-- operator: --
+|   |   |   |   |   +-- argument: Identifier at 2:7
+|   |   |   |   |   |   +-- name: b
+|   |   |   |   |   +-- prefix: True

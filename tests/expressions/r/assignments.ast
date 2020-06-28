@@ -1,0 +1,120 @@
+Program at 1:0
++-- sourceType: script
++-- body:
+|   +-- 0: ExpressionStatement at 1:0
+|   |   +-- expression: SequenceExpression at 1:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 1:0
+|   |   |   |   |   +-- operator: =
+|   |   |   |   |   +-- left: Identifier at 1:0
+|   |   |   |   |   |   +-- name: a
+|   |   |   |   |   +-- right: Literal at 1:4
+|   |   |   |   |   |   +-- value: 1.0
+|   +-- 1: ExpressionStatement at 2:0
+|   |   +-- expression: SequenceExpression at 2:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 2:0
+|   |   |   |   |   +-- operator: *=
+|   |   |   |   |   +-- left: Identifier at 2:0
+|   |   |   |   |   |   +-- name: q
+|   |   |   |   |   +-- right: Literal at 2:5
+|   |   |   |   |   |   +-- value: 2.0
+|   +-- 2: ExpressionStatement at 3:0
+|   |   +-- expression: SequenceExpression at 3:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 3:0
+|   |   |   |   |   +-- operator: /=
+|   |   |   |   |   +-- left: Identifier at 3:0
+|   |   |   |   |   |   +-- name: d
+|   |   |   |   |   +-- right: Literal at 3:5
+|   |   |   |   |   |   +-- value: 2.0
+|   +-- 3: ExpressionStatement at 4:0
+|   |   +-- expression: SequenceExpression at 4:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 4:0
+|   |   |   |   |   +-- operator: %=
+|   |   |   |   |   +-- left: Identifier at 4:0
+|   |   |   |   |   |   +-- name: w
+|   |   |   |   |   +-- right: Literal at 4:5
+|   |   |   |   |   |   +-- value: 15.0
+|   +-- 4: ExpressionStatement at 5:0
+|   |   +-- expression: SequenceExpression at 5:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 5:0
+|   |   |   |   |   +-- operator: +=
+|   |   |   |   |   +-- left: Identifier at 5:0
+|   |   |   |   |   |   +-- name: b
+|   |   |   |   |   +-- right: Literal at 5:5
+|   |   |   |   |   |   +-- value: 12.0
+|   +-- 5: ExpressionStatement at 6:0
+|   |   +-- expression: SequenceExpression at 6:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 6:0
+|   |   |   |   |   +-- operator: -=
+|   |   |   |   |   +-- left: Identifier at 6:0
+|   |   |   |   |   |   +-- name: c
+|   |   |   |   |   +-- right: Literal at 6:5
+|   |   |   |   |   |   +-- value: 14.0
+|   +-- 6: ExpressionStatement at 7:0
+|   |   +-- expression: SequenceExpression at 7:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 7:0
+|   |   |   |   |   +-- operator: <<=
+|   |   |   |   |   +-- left: Identifier at 7:0
+|   |   |   |   |   |   +-- name: a
+|   |   |   |   |   +-- right: Literal at 7:6
+|   |   |   |   |   |   +-- value: 1.0
+|   +-- 7: ExpressionStatement at 8:0
+|   |   +-- expression: SequenceExpression at 8:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 8:0
+|   |   |   |   |   +-- operator: >>=
+|   |   |   |   |   +-- left: Identifier at 8:0
+|   |   |   |   |   |   +-- name: b
+|   |   |   |   |   +-- right: Literal at 8:6
+|   |   |   |   |   |   +-- value: 2.0
+|   +-- 8: ExpressionStatement at 9:0
+|   |   +-- expression: SequenceExpression at 9:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 9:0
+|   |   |   |   |   +-- operator: >>>=
+|   |   |   |   |   +-- left: Identifier at 9:0
+|   |   |   |   |   |   +-- name: z
+|   |   |   |   |   +-- right: Literal at 9:7
+|   |   |   |   |   |   +-- value: 2.0
+|   +-- 9: ExpressionStatement at 10:0
+|   |   +-- expression: SequenceExpression at 10:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 10:0
+|   |   |   |   |   +-- operator: &=
+|   |   |   |   |   +-- left: Identifier at 10:0
+|   |   |   |   |   |   +-- name: v
+|   |   |   |   |   +-- right: Literal at 10:5
+|   |   |   |   |   |   +-- value: 1.0
+|   +-- 10: ExpressionStatement at 11:0
+|   |   +-- expression: SequenceExpression at 11:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 11:0
+|   |   |   |   |   +-- operator: ^=
+|   |   |   |   |   +-- left: Identifier at 11:0
+|   |   |   |   |   |   +-- name: cc
+|   |   |   |   |   +-- right: Identifier at 11:6
+|   |   |   |   |   |   +-- name: cc
+|   +-- 11: ExpressionStatement at 12:0
+|   |   +-- expression: SequenceExpression at 12:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 12:0
+|   |   |   |   |   +-- operator: |=
+|   |   |   |   |   +-- left: Identifier at 12:0
+|   |   |   |   |   |   +-- name: vv
+|   |   |   |   |   +-- right: Identifier at 12:5
+|   |   |   |   |   |   +-- name: a
+|   +-- 12: ExpressionStatement at 13:0
+|   |   +-- expression: SequenceExpression at 13:0
+|   |   |   +-- expressions:
+|   |   |   |   +-- 0: AssignmentExpression at 13:0
+|   |   |   |   |   +-- operator: **=
+|   |   |   |   |   +-- left: Identifier at 13:0
+|   |   |   |   |   |   +-- name: x
+|   |   |   |   |   +-- right: Literal at 13:6
+|   |   |   |   |   |   +-- value: 2.0
