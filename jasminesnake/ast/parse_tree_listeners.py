@@ -86,7 +86,8 @@ class LiteralListener(JSBaseListener):
             value = ctx.BooleanLiteral().getText() == "true"
             self._literal = nodes.BooleanLiteral(loc, value)
         elif ctx.StringLiteral() is not None:
-            self._literal = nodes.StringLiteral(loc, ctx.StringLiteral().getText())
+            value = ctx.StringLiteral().getText()[1:-1]  # Strip quotes
+            self._literal = nodes.StringLiteral(loc, value)
         else:
             ctx.getChild(0).enterRule(self)
 
