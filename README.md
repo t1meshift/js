@@ -3,6 +3,7 @@ Another JavaScript interpreter written on Python 3.
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![SemVer: 2.0.0](https://img.shields.io/badge/SemVer-2.0.0-F8DE7E?labelColor=23261D)](https://semver.org/spec/v2.0.0.html)
+![Testing status](https://github.com/t1meshift/js/workflows/Testing/badge.svg)
 
 ## Requirements
 
