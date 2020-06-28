@@ -586,7 +586,10 @@ class StatementListener(JSBaseListener):
 class SourceElementListener(JSBaseListener):
     """The proxy between Program and Statement."""
 
-    _elems: List[nodes.Statement] = []
+    _elems: List[nodes.Statement]
+
+    def __init__(self):
+        self._elems = []
 
     @property
     def source_elements(self) -> List[nodes.Statement]:
@@ -605,8 +608,11 @@ class SourceElementListener(JSBaseListener):
 class ASTListener(JSBaseListener):
     """AST listener."""
 
-    _program_node: Optional[nodes.Program] = None
+    _program_node: Optional[nodes.Program]
     _source_type: nodes.SourceTypeLiteral
+
+    def __init__(self):
+        self._program_node = None
 
     @property
     def program_node(self) -> nodes.Program:
