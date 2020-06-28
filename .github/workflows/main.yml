@@ -33,7 +33,7 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: Build ANTLR lexer and parser
       run: |
-        antlr4 -Xexact-output-dir -o jasminesnake/lex -package lex -Dlanguage=Python3 -listener grammars/*.g4
+        $JAVA_EXEC -jar $Antlr4ToolPath -Xexact-output-dir -o jasminesnake/lex -package lex -Dlanguage=Python3 -listener grammars/*.g4
         
     - name: Install deps from pip
       run: |
